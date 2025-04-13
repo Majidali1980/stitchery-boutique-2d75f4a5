@@ -1,10 +1,30 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
+import { SignedIn, SignedOut, RedirectToSignIn } from "@clerk/clerk-react";
+
+// Layouts
+import MainLayout from "@/layouts/MainLayout";
+import AdminLayout from "@/layouts/AdminLayout";
+
+// Pages
+import HomePage from "@/pages/HomePage";
+import ProductsPage from "@/pages/ProductsPage";
+import ProductDetailPage from "@/pages/ProductDetailPage";
+import CartPage from "@/pages/CartPage";
+import CheckoutPage from "@/pages/CheckoutPage";
+import WishlistPage from "@/pages/WishlistPage";
+import OrderConfirmationPage from "@/pages/OrderConfirmationPage";
+import AboutPage from "@/pages/AboutPage";
+import ContactPage from "@/pages/ContactPage";
+import TermsPage from "@/pages/TermsPage";
+import PolicyPage from "@/pages/PolicyPage";
+import AdminDashboardPage from "@/pages/admin/AdminDashboardPage";
+import AdminOrdersPage from "@/pages/admin/AdminOrdersPage";
+import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
 
@@ -15,8 +35,66 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          {/* Public Routes */}
+          <Route path="/" element={<MainLayout />}>
+            <Route index element={<HomePage />} />
+            <Route path="products" element={<ProductsPage />} />
+            <Route path="products/:id" element={<ProductDetailPage />} />
+            <Route path="cart" element={<CartPage />} />
+            <Route path="about" element={<AboutPage />} />
+            <Route path="contact" element={<ContactPage />} />
+            <Route path="terms" element={<TermsPage />} />
+            <Route path="policy" element={<PolicyPage />} />
+            
+            {/* Protected Routes */}
+            <Route path="checkout" element={
+              <>
+                <SignedIn>
+                  <CheckoutPage />
+                </SignedIn>
+                <SignedOut>
+                  <RedirectToSignIn />
+                </SignedOut>
+              </>
+            } />
+            <Route path="wishlist" element={
+              <>
+                <SignedIn>
+                  <WishlistPage />
+                </SignedIn>
+                <SignedOut>
+                  <RedirectToSignIn />
+                </SignedOut>
+              </>
+            } />
+            <Route path="order-confirmation" element={
+              <>
+                <SignedIn>
+                  <OrderConfirmationPage />
+                </SignedIn>
+                <SignedOut>
+                  <RedirectToSignIn />
+                </SignedOut>
+              </>
+            } />
+          </Route>
+          
+          {/* Admin Routes */}
+          <Route path="/admin" element={
+            <>
+              <SignedIn>
+                <AdminLayout />
+              </SignedIn>
+              <SignedOut>
+                <RedirectToSignIn />
+              </SignedOut>
+            </>
+          }>
+            <Route index element={<AdminDashboardPage />} />
+            <Route path="orders" element={<AdminOrdersPage />} />
+          </Route>
+          
+          {/* 404 Route */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

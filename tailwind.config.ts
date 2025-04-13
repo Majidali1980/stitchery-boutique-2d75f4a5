@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,6 +62,15 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				brand: {
+					gold: "#D4AF37",
+					black: "#1A1A1A",
+					purple: "#8B5CF6",
+					pink: "#FFC0CB",
+					"light-pink": "#FFE4E1",
+					teal: "#33C3F0",
+					maroon: "#800000"
 				}
 			},
 			borderRadius: {
@@ -84,11 +94,25 @@ export default {
 					to: {
 						height: '0'
 					}
-				}
+				},
+				marquee: {
+					'0%': { transform: 'translateX(0%)' },
+					'100%': { transform: 'translateX(-100%)' }
+				},
+				shimmer: {
+					'0%': {
+						backgroundPosition: '-40rem 0',
+					},
+					'100%': {
+						backgroundPosition: '40rem 0',
+					},
+				},
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				marquee: 'marquee 25s linear infinite',
+				shimmer: 'shimmer 2s infinite',
 			}
 		}
 	},
