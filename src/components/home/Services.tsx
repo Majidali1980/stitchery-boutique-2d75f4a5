@@ -1,8 +1,7 @@
-
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { stitchingServices } from "@/data/services";
-import { Scissors, Tape, Star } from "lucide-react";
+import { Scissors, Ruler, Star } from "lucide-react";
 
 const Services = () => {
   return (
@@ -45,7 +44,7 @@ const Services = () => {
           
           <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100 flex flex-col">
             <div className="mb-4 p-3 rounded-full bg-blue-100 w-12 h-12 flex items-center justify-center">
-              <Tape className="text-brand-teal" size={24} />
+              <Ruler className="text-brand-teal" size={24} />
             </div>
             <h3 className="text-xl font-semibold mb-2">Alteration Services</h3>
             <p className="text-gray-600 mb-4 flex-grow">
