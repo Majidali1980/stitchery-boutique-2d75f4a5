@@ -4,12 +4,11 @@ import { ClerkProvider } from "@clerk/clerk-react";
 import App from './App.tsx';
 import './index.css';
 
-// Clerk publishable key
-// Replace with your actual publishable key once you create a Clerk account
-const PUBLISHABLE_KEY = "REPLACE_WITH_YOUR_PUBLISHABLE_KEY";
+// IMPORTANT: Replace this with your actual Clerk publishable key
+const PUBLISHABLE_KEY = "YOUR_ACTUAL_CLERK_PUBLISHABLE_KEY";
 
 if (!PUBLISHABLE_KEY) {
-  console.warn("Missing Clerk Publishable Key. Please visit https://go.clerk.com/lovable to create an account.");
+  throw new Error("Missing Clerk Publishable Key. Please visit https://dashboard.clerk.com to create an account and obtain your key.");
 }
 
 createRoot(document.getElementById("root")!).render(
