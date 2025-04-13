@@ -2,19 +2,17 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { 
-  Heart, ShoppingCart, Menu, X, Search, User 
+  Heart, ShoppingCart, Menu, X, Search 
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
-import { SignInButton, SignUpButton, UserButton, useUser } from "@clerk/clerk-react";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { items: cartItems } = useCart();
   const { items: wishlistItems } = useWishlist();
-  const { isSignedIn, user } = useUser();
   
   return (
     <header className="border-b">
@@ -55,6 +53,12 @@ const Header = () => {
             <Link to="/products" className="text-sm font-medium hover:text-brand-gold transition-colors">
               Products
             </Link>
+            <Link to="/custom-stitching" className="text-sm font-medium hover:text-brand-gold transition-colors">
+              Custom Stitching
+            </Link>
+            <Link to="/size-chart" className="text-sm font-medium hover:text-brand-gold transition-colors">
+              Size Chart
+            </Link>
             <Link to="/about" className="text-sm font-medium hover:text-brand-gold transition-colors">
               About
             </Link>
@@ -91,18 +95,12 @@ const Header = () => {
               )}
             </Link>
             
-            {isSignedIn ? (
-              <UserButton afterSignOutUrl="/" />
-            ) : (
-              <div className="flex items-center space-x-2">
-                <SignInButton mode="modal">
-                  <Button variant="outline" size="sm">Sign In</Button>
-                </SignInButton>
-                <SignUpButton mode="modal">
-                  <Button size="sm">Sign Up</Button>
-                </SignUpButton>
-              </div>
-            )}
+            <Link to="/login">
+              <Button variant="outline" size="sm">Login</Button>
+            </Link>
+            <Link to="/signup">
+              <Button size="sm">Sign Up</Button>
+            </Link>
           </div>
         </div>
       </div>
@@ -124,6 +122,20 @@ const Header = () => {
               onClick={() => setIsMenuOpen(false)}
             >
               Products
+            </Link>
+            <Link 
+              to="/custom-stitching" 
+              className="text-lg font-medium hover:text-brand-gold"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Custom Stitching
+            </Link>
+            <Link 
+              to="/size-chart" 
+              className="text-lg font-medium hover:text-brand-gold"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Size Chart
             </Link>
             <Link 
               to="/about" 

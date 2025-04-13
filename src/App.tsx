@@ -51,6 +51,8 @@ const App = () => (
             <Route path="checkout" element={<CheckoutPage />} />
             <Route path="wishlist" element={<WishlistPage />} />
             <Route path="order-confirmation" element={<OrderConfirmationPage />} />
+            <Route path="login" element={<NotFound />} />
+            <Route path="signup" element={<NotFound />} />
           </Route>
           
           {/* Admin Routes */}
