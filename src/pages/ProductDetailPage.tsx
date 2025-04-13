@@ -3,22 +3,98 @@ import { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { 
   Heart, ShoppingCart, Minus, Plus, Check, ArrowRight,
-  ChevronLeft, ChevronRight
+  ChevronLeft, ChevronRight, Facebook, Twitter, Instagram, Share2, LinkIcon
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { getProductById, products } from "@/data/products";
+import { 
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { toast } from "@/components/ui/use-toast";
+import { getProductById, products, getProductsByCategory } from "@/data/products";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import ProductGrid from "@/components/products/ProductGrid";
 
+const SizeChart = ({ type }: { type: string }) => {
+  const measurements = [
+    { label: "Chest", description: "Measured under armpits around chest" },
+    { label: "Length", description: "From shoulder to bottom hem" },
+    { label: "Shoulder Width", description: "From shoulder seam to shoulder seam" },
+    { label: "Sleeve", description: "From shoulder seam to sleeve end" },
+    { label: "Daman", description: "Width at the bottom hem" },
+    { label: "Collar", description: "Neck circumference" },
+  ];
+  
+  const shalwarMeasurements = [
+    { label: "Waist", description: "Around natural waistline" },
+    { label: "Hip", description: "Around fullest part of hip" },
+    { label: "Length", description: "From waist to ankle" },
+    { label: "Bottom Width", description: "Width at ankle" }
+  ];
+  
+  const selectedMeasurements = type.includes("shalwar") ? shalwarMeasurements : measurements;
+  
+  const sizes = ["S", "M", "L", "XL"];
+  
+  return (
+    <div className="overflow-x-auto">
+      <table className="min-w-full border-collapse">
+        <thead>
+          <tr className="bg-gray-50">
+            <th className="border px-4 py-2 text-left">Size</th>
+            {selectedMeasurements.map((m) => (
+              <th key={m.label} className="border px-4 py-2 text-left">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <span className="border-b border-dotted border-gray-400">{m.label}</span>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="text-xs">{m.description}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {sizes.map((size, i) => (
+            <tr key={size} className={i % 2 === 0 ? "" : "bg-gray-50"}>
+              <td className="border px-4 py-2">{size}</td>
+              {selectedMeasurements.map((m, j) => (
+                <td key={`${size}-${m.label}`} className="border px-4 py-2">
+                  {/* Generate reasonable measurement values */}
+                  {m.label === "Length" ? 38 + (i * 2) : 
+                   m.label === "Chest" ? 36 + (i * 2) : 
+                   m.label === "Shoulder Width" ? 16 + (i * 0.5) : 
+                   m.label === "Sleeve" ? 24 + (i * 1) :
+                   m.label === "Daman" ? 22 + (i * 1) :
+                   m.label === "Waist" ? 30 + (i * 2) :
+                   m.label === "Hip" ? 36 + (i * 2) :
+                   m.label === "Bottom Width" ? 16 + (i * 0.5) :
+                   16 + (i * 0.5)} in
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
 const ProductDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { addItem } = useCart();
+  const { addToCart } = useCart();
   const { addItem: addToWishlist, isInWishlist } = useWishlist();
   
   const product = getProductById(id || "");
@@ -52,16 +128,39 @@ const ProductDetailPage = () => {
   };
   
   const handleAddToCart = () => {
-    addItem(product, quantity);
+    addToCart(product, quantity, selectedSize);
+    toast({
+      title: "Product added to cart",
+      description: `${product.name} (${quantity}) has been added to your cart.`,
+    });
   };
   
   const handleAddToWishlist = () => {
     addToWishlist(product);
+    toast({
+      title: isInWishlist(product.id) ? "Already in wishlist" : "Added to wishlist",
+      description: isInWishlist(product.id) 
+        ? `${product.name} is already in your wishlist` 
+        : `${product.name} has been added to your wishlist`,
+    });
   };
   
-  // Get similar products (same category)
-  const similarProducts = products
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(window.location.href);
+    toast({
+      title: "Link copied",
+      description: "Product link copied to clipboard",
+    });
+  };
+  
+  // Get related products (same category)
+  const relatedProducts = products
     .filter(p => p.category === product.category && p.id !== product.id)
+    .slice(0, 4);
+
+  // Get similar type products (ready-to-wear or unstitched)
+  const similarTypeProducts = products
+    .filter(p => p.type === product.type && p.id !== product.id && p.category !== product.category)
     .slice(0, 4);
   
   return (
@@ -73,6 +172,13 @@ const ProductDetailPage = () => {
         <span className="mx-2 text-gray-400">/</span>
         <Link to="/products" className="text-gray-500 hover:text-brand-gold">
           Products
+        </Link>
+        <span className="mx-2 text-gray-400">/</span>
+        <Link 
+          to={`/products?category=${product.category}`} 
+          className="text-gray-500 hover:text-brand-gold"
+        >
+          {product.category.charAt(0).toUpperCase() + product.category.slice(1)}
         </Link>
         <span className="mx-2 text-gray-400">/</span>
         <span className="font-medium">{product.name}</span>
@@ -118,7 +224,7 @@ const ProductDetailPage = () => {
                 <div
                   key={idx}
                   className={`cursor-pointer border-2 rounded-md overflow-hidden w-20 h-20 ${
-                    currentImgIndex === idx ? "border-brand-gold" : "border-transparent"
+                    currentImgIndex === idx ? 'border-brand-gold' : 'border-transparent'
                   }`}
                   onClick={() => setCurrentImgIndex(idx)}
                 >
@@ -131,6 +237,45 @@ const ProductDetailPage = () => {
               ))}
             </div>
           )}
+          
+          {/* Social Sharing */}
+          <div className="mt-6">
+            <p className="text-sm text-gray-500 mb-2">Share this product:</p>
+            <div className="flex space-x-3">
+              <Button 
+                variant="outline" 
+                size="icon" 
+                className="rounded-full" 
+                onClick={() => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`, '_blank')}
+              >
+                <Facebook size={16} />
+              </Button>
+              <Button 
+                variant="outline" 
+                size="icon" 
+                className="rounded-full" 
+                onClick={() => window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(product.name)}&url=${encodeURIComponent(window.location.href)}`, '_blank')}
+              >
+                <Twitter size={16} />
+              </Button>
+              <Button 
+                variant="outline" 
+                size="icon" 
+                className="rounded-full" 
+                onClick={() => window.open(`https://www.instagram.com/`, '_blank')}
+              >
+                <Instagram size={16} />
+              </Button>
+              <Button 
+                variant="outline" 
+                size="icon" 
+                className="rounded-full" 
+                onClick={copyToClipboard}
+              >
+                <LinkIcon size={16} />
+              </Button>
+            </div>
+          </div>
         </div>
         
         {/* Product Details */}
@@ -254,7 +399,7 @@ const ProductDetailPage = () => {
                 Various stitching options are available including dori piping, lace work, and more.
               </p>
               <Button asChild variant="outline">
-                <Link to="/services">View Stitching Options</Link>
+                <Link to="/custom-stitching">View Stitching Options</Link>
               </Button>
             </div>
           )}
@@ -325,49 +470,7 @@ const ProductDetailPage = () => {
               </p>
               
               {product.type === "ready-to-wear" && (
-                <div className="overflow-x-auto">
-                  <table className="min-w-full border-collapse">
-                    <thead>
-                      <tr className="bg-gray-50">
-                        <th className="border px-4 py-2 text-left">Size</th>
-                        <th className="border px-4 py-2 text-left">Bust (inches)</th>
-                        <th className="border px-4 py-2 text-left">Waist (inches)</th>
-                        <th className="border px-4 py-2 text-left">Hip (inches)</th>
-                        <th className="border px-4 py-2 text-left">Length (inches)</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td className="border px-4 py-2">S</td>
-                        <td className="border px-4 py-2">34-36</td>
-                        <td className="border px-4 py-2">28-30</td>
-                        <td className="border px-4 py-2">36-38</td>
-                        <td className="border px-4 py-2">42</td>
-                      </tr>
-                      <tr className="bg-gray-50">
-                        <td className="border px-4 py-2">M</td>
-                        <td className="border px-4 py-2">36-38</td>
-                        <td className="border px-4 py-2">30-32</td>
-                        <td className="border px-4 py-2">38-40</td>
-                        <td className="border px-4 py-2">43</td>
-                      </tr>
-                      <tr>
-                        <td className="border px-4 py-2">L</td>
-                        <td className="border px-4 py-2">38-40</td>
-                        <td className="border px-4 py-2">32-34</td>
-                        <td className="border px-4 py-2">40-42</td>
-                        <td className="border px-4 py-2">44</td>
-                      </tr>
-                      <tr className="bg-gray-50">
-                        <td className="border px-4 py-2">XL</td>
-                        <td className="border px-4 py-2">40-42</td>
-                        <td className="border px-4 py-2">34-36</td>
-                        <td className="border px-4 py-2">42-44</td>
-                        <td className="border px-4 py-2">45</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+                <SizeChart type={product.category} />
               )}
             </div>
           </TabsContent>
@@ -392,15 +495,22 @@ const ProductDetailPage = () => {
         </Tabs>
       </div>
       
-      {/* Similar Products */}
-      {similarProducts.length > 0 && (
+      {/* Related Products */}
+      {relatedProducts.length > 0 && (
         <div className="mt-16">
-          <h2 className="text-2xl font-semibold mb-6">You May Also Like</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {similarProducts.map(product => (
-              <ProductGrid key={product.id} products={[product]} />
-            ))}
-          </div>
+          <h2 className="text-2xl font-semibold mb-6">Related Products</h2>
+          <ProductGrid products={relatedProducts} />
+        </div>
+      )}
+      
+      {/* Similar Type Products */}
+      {similarTypeProducts.length > 0 && (
+        <div className="mt-16">
+          <h2 className="text-2xl font-semibold mb-6">
+            You May Also Like
+            {product.type === "ready-to-wear" ? " (Ready to Wear)" : " (Unstitched)"}
+          </h2>
+          <ProductGrid products={similarTypeProducts} />
         </div>
       )}
     </div>

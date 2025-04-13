@@ -13,6 +13,8 @@ export interface GarmentSizeChart {
   };
 }
 
+export type ServiceType = "standard" | "custom" | "premium";
+
 export interface CustomStitchingOrder {
   garmentType: "shirt" | "shalwar" | "pajama" | "complete-suit";
   serviceType: ServiceType;

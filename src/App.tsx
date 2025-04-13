@@ -23,9 +23,12 @@ import TermsPage from "@/pages/TermsPage";
 import PolicyPage from "@/pages/PolicyPage";
 import AdminDashboardPage from "@/pages/admin/AdminDashboardPage";
 import AdminOrdersPage from "@/pages/admin/AdminOrdersPage";
+import AdminStitchingOrdersPage from "@/pages/admin/AdminStitchingOrdersPage";
+import AdminProductsPage from "@/pages/admin/AdminProductsPage";
 import NotFound from "@/pages/NotFound";
 import CustomStitchingPage from "@/pages/CustomStitchingPage";
 import SizeChartPage from "@/pages/SizeChartPage";
+import UnstitchedSuitsPage from "@/pages/UnstitchedSuitsPage";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +47,7 @@ const App = () => (
             <Route path="cart" element={<CartPage />} />
             <Route path="custom-stitching" element={<CustomStitchingPage />} />
             <Route path="size-chart" element={<SizeChartPage />} />
+            <Route path="unstitched-suits" element={<UnstitchedSuitsPage />} />
             <Route path="about" element={<AboutPage />} />
             <Route path="contact" element={<ContactPage />} />
             <Route path="terms" element={<TermsPage />} />
@@ -59,6 +63,8 @@ const App = () => (
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboardPage />} />
             <Route path="orders" element={<AdminOrdersPage />} />
+            <Route path="stitching-orders" element={<AdminStitchingOrdersPage />} />
+            <Route path="products" element={<AdminProductsPage />} />
           </Route>
           
           {/* 404 Route */}
