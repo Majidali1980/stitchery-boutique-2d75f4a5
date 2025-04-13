@@ -1,137 +1,164 @@
+import { createContext, useContext, useState, ReactNode, useMemo } from 'react';
+import { Product } from '@/types';
 
-import { createContext, useContext, useState, useEffect } from "react";
-import { toast } from "@/components/ui/use-toast";
-import { Product } from "@/types";
-
-interface CartItem {
+// Define the CartItem type
+interface ProductCartItem {
+  type: 'product';
   product: Product;
+  quantity: number;
+  selectedSize?: string;
+  selectedColor?: string;
+}
+
+// Extend the CartItem type to include stitching orders
+interface StitchingCartItem {
+  type: 'stitching';
+  service: {
+    garmentType: string;
+    serviceType: string;
+    measurements: Record<string, number>;
+    fabric?: string;
+    designImage?: string | null;
+    notes?: string;
+    price: number;
+  };
   quantity: number;
 }
 
-interface CartContextType {
+// Update CartItem type to be a union type
+type CartItem = ProductCartItem | StitchingCartItem;
+
+interface CartContextProps {
   items: CartItem[];
-  addItem: (product: Product, quantity?: number) => void;
-  removeItem: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
+  addToCart: (product: Product, quantity: number, size?: string, color?: string) => void;
+  addStitchingToCart: (stitchingService: StitchingCartItem['service']) => void;
+  removeFromCart: (itemId: string) => void;
+  updateQuantity: (itemId: string, quantity: number) => void;
   clearCart: () => void;
-  totalItems: number;
   totalPrice: number;
+  totalItems: number;
 }
 
-const CartContext = createContext<CartContextType | null>(null);
+export const CartContext = createContext<CartContextProps>({
+  items: [],
+  addToCart: () => {},
+  addStitchingToCart: () => {},
+  removeFromCart: () => {},
+  updateQuantity: () => {},
+  clearCart: () => {},
+  totalPrice: 0,
+  totalItems: 0,
+});
 
-export const useCart = () => {
-  const context = useContext(CartContext);
-  if (!context) {
-    throw new Error("useCart must be used within a CartProvider");
-  }
-  return context;
-};
-
-export const CartProvider = ({ children }: { children: React.ReactNode }) => {
+export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [items, setItems] = useState<CartItem[]>([]);
   
-  // Load cart from localStorage on initial render
-  useEffect(() => {
-    const savedCart = localStorage.getItem("cart");
-    if (savedCart) {
-      try {
-        setItems(JSON.parse(savedCart));
-      } catch (error) {
-        console.error("Failed to parse cart from localStorage:", error);
+  // Calculate total price
+  const totalPrice = useMemo(() => {
+    return items.reduce((total, item) => {
+      if (item.type === 'product') {
+        return total + (item.product.price * item.quantity);
+      } else {
+        return total + (item.service.price * item.quantity);
       }
-    }
-  }, []);
-  
-  // Save cart to localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(items));
+    }, 0);
   }, [items]);
   
-  const addItem = (product: Product, quantity = 1) => {
+  // Calculate total items
+  const totalItems = useMemo(() => {
+    return items.reduce((total, item) => total + item.quantity, 0);
+  }, [items]);
+  
+  // Add product to cart
+  const addToCart = (product: Product, quantity: number, size?: string, color?: string) => {
     setItems(prevItems => {
-      const existingItem = prevItems.find(item => item.product.id === product.id);
+      // Check if product already in cart with same size and color
+      const existingItemIndex = prevItems.findIndex(
+        item => item.type === 'product' && item.product.id === product.id && item.selectedSize === size && item.selectedColor === color
+      );
       
-      if (existingItem) {
-        toast({
-          title: "Item already in cart",
-          description: `Updated ${product.name} quantity to ${existingItem.quantity + quantity}`,
-        });
-        
-        return prevItems.map(item => 
-          item.product.id === product.id
-            ? { ...item, quantity: item.quantity + quantity }
-            : item
-        );
+      if (existingItemIndex >= 0) {
+        // Update quantity of existing item
+        const newItems = [...prevItems];
+        newItems[existingItemIndex].quantity += quantity;
+        return newItems;
+      } else {
+        // Add new item
+        return [...prevItems, { 
+          type: 'product',
+          product, 
+          quantity,
+          selectedSize: size,
+          selectedColor: color
+        }];
       }
-      
-      toast({
-        title: "Added to cart",
-        description: `${product.name} added to your cart`,
-      });
-      
-      return [...prevItems, { product, quantity }];
     });
   };
-  
-  const removeItem = (productId: string) => {
+
+  // Add stitching service to cart
+  const addStitchingToCart = (stitchingService: StitchingCartItem['service']) => {
     setItems(prevItems => {
-      const filtered = prevItems.filter(item => item.product.id !== productId);
-      
-      toast({
-        title: "Item removed",
-        description: "Item removed from your cart",
-      });
-      
-      return filtered;
+      return [...prevItems, {
+        type: 'stitching',
+        service: stitchingService,
+        quantity: 1
+      }];
     });
   };
   
-  const updateQuantity = (productId: string, quantity: number) => {
-    if (quantity < 1) {
-      return removeItem(productId);
+  // Remove item from cart
+  const removeFromCart = (itemId: string) => {
+    setItems(prevItems => {
+      if (prevItems[0]?.type === 'product') {
+        return prevItems.filter(item => 
+          item.type === 'product' && item.product.id !== itemId
+        );
+      } else {
+        // For stitching items, we'll use the index as the ID since they don't have a unique id
+        const index = parseInt(itemId);
+        return prevItems.filter((_, idx) => idx !== index);
+      }
+    });
+  };
+  
+  // Update quantity of an item
+  const updateQuantity = (itemId: string, quantity: number) => {
+    if (quantity <= 0) {
+      removeFromCart(itemId);
+      return;
     }
     
-    setItems(prevItems =>
-      prevItems.map(item =>
-        item.product.id === productId
-          ? { ...item, quantity }
-          : item
-      )
-    );
-  };
-  
-  const clearCart = () => {
-    setItems([]);
-    toast({
-      title: "Cart cleared",
-      description: "Your cart has been cleared",
+    setItems(prevItems => {
+      return prevItems.map(item => {
+        if (item.type === 'product' && item.product.id === itemId) {
+          return { ...item, quantity };
+        } else if (item.type === 'stitching' && itemId === prevItems.indexOf(item).toString()) {
+          return { ...item, quantity };
+        }
+        return item;
+      });
     });
   };
   
-  const totalItems = items.reduce(
-    (total, item) => total + item.quantity, 
-    0
-  );
-  
-  const totalPrice = items.reduce(
-    (total, item) => total + (item.product.price * item.quantity), 
-    0
-  );
+  // Clear cart
+  const clearCart = () => {
+    setItems([]);
+  };
   
   return (
-    <CartContext.Provider
-      value={{
-        items,
-        addItem,
-        removeItem,
-        updateQuantity,
-        clearCart,
-        totalItems,
-        totalPrice,
-      }}
-    >
+    <CartContext.Provider value={{
+      items,
+      addToCart,
+      addStitchingToCart,
+      removeFromCart,
+      updateQuantity,
+      clearCart,
+      totalPrice,
+      totalItems,
+    }}>
       {children}
     </CartContext.Provider>
   );
 };
+
+export const useCart = () => useContext(CartContext);

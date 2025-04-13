@@ -4,7 +4,6 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { SignedIn, SignedOut, RedirectToSignIn } from "@clerk/clerk-react";
 
 // Layouts
 import MainLayout from "@/layouts/MainLayout";
@@ -25,6 +24,8 @@ import PolicyPage from "@/pages/PolicyPage";
 import AdminDashboardPage from "@/pages/admin/AdminDashboardPage";
 import AdminOrdersPage from "@/pages/admin/AdminOrdersPage";
 import NotFound from "@/pages/NotFound";
+import CustomStitchingPage from "@/pages/CustomStitchingPage";
+import SizeChartPage from "@/pages/SizeChartPage";
 
 const queryClient = new QueryClient();
 
@@ -41,55 +42,19 @@ const App = () => (
             <Route path="products" element={<ProductsPage />} />
             <Route path="products/:id" element={<ProductDetailPage />} />
             <Route path="cart" element={<CartPage />} />
+            <Route path="custom-stitching" element={<CustomStitchingPage />} />
+            <Route path="size-chart" element={<SizeChartPage />} />
             <Route path="about" element={<AboutPage />} />
             <Route path="contact" element={<ContactPage />} />
             <Route path="terms" element={<TermsPage />} />
             <Route path="policy" element={<PolicyPage />} />
-            
-            {/* Protected Routes */}
-            <Route path="checkout" element={
-              <>
-                <SignedIn>
-                  <CheckoutPage />
-                </SignedIn>
-                <SignedOut>
-                  <RedirectToSignIn />
-                </SignedOut>
-              </>
-            } />
-            <Route path="wishlist" element={
-              <>
-                <SignedIn>
-                  <WishlistPage />
-                </SignedIn>
-                <SignedOut>
-                  <RedirectToSignIn />
-                </SignedOut>
-              </>
-            } />
-            <Route path="order-confirmation" element={
-              <>
-                <SignedIn>
-                  <OrderConfirmationPage />
-                </SignedIn>
-                <SignedOut>
-                  <RedirectToSignIn />
-                </SignedOut>
-              </>
-            } />
+            <Route path="checkout" element={<CheckoutPage />} />
+            <Route path="wishlist" element={<WishlistPage />} />
+            <Route path="order-confirmation" element={<OrderConfirmationPage />} />
           </Route>
           
           {/* Admin Routes */}
-          <Route path="/admin" element={
-            <>
-              <SignedIn>
-                <AdminLayout />
-              </SignedIn>
-              <SignedOut>
-                <RedirectToSignIn />
-              </SignedOut>
-            </>
-          }>
+          <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboardPage />} />
             <Route path="orders" element={<AdminOrdersPage />} />
           </Route>

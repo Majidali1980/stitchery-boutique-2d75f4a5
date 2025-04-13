@@ -1,7 +1,6 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useUser } from "@clerk/clerk-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,13 +10,12 @@ import { toast } from "@/components/ui/use-toast";
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
-  const { user } = useUser();
   const { items, clearCart, totalPrice } = useCart();
   
   const [formData, setFormData] = useState({
-    firstName: user?.firstName || "",
-    lastName: user?.lastName || "",
-    email: user?.primaryEmailAddress?.emailAddress || "",
+    firstName: "",
+    lastName: "",
+    email: "",
     phone: "",
     address: "",
     city: "",
@@ -260,22 +258,34 @@ const CheckoutPage = () => {
             <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
             
             <div className="space-y-4 mb-6">
-              {items.map(item => (
-                <div key={item.product.id} className="flex gap-3">
+              {items.map((item, index) => (
+                <div key={item.type === 'product' ? item.product.id : `stitching-${index}`} className="flex gap-3">
                   <div className="w-16 h-16 rounded overflow-hidden flex-shrink-0">
-                    <img 
-                      src={item.product.images[0]} 
-                      alt={item.product.name}
-                      className="w-full h-full object-cover"
-                    />
+                    {item.type === 'product' ? (
+                      <img 
+                        src={item.product.images[0]} 
+                        alt={item.product.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-brand-gold/20 flex items-center justify-center">
+                        <span className="text-brand-gold text-xl">✂️</span>
+                      </div>
+                    )}
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-medium text-sm">{item.product.name}</h3>
+                    <h3 className="font-medium text-sm">
+                      {item.type === 'product' 
+                        ? item.product.name 
+                        : `Custom ${item.service.garmentType.charAt(0).toUpperCase() + item.service.garmentType.slice(1)} Stitching`}
+                    </h3>
                     <p className="text-gray-500 text-xs mt-1">Qty: {item.quantity}</p>
                   </div>
                   <div className="text-right">
                     <span className="font-medium">
-                      Rs. {(item.product.price * item.quantity).toLocaleString()}
+                      Rs. {(item.type === 'product' 
+                        ? item.product.price * item.quantity 
+                        : item.service.price * item.quantity).toLocaleString()}
                     </span>
                   </div>
                 </div>
