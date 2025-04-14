@@ -5,6 +5,7 @@ import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
+import AuthProtected from "@/components/auth/AuthProtected";
 
 import MainLayout from "@/layouts/MainLayout";
 import AdminLayout from "@/layouts/AdminLayout";
@@ -46,8 +47,8 @@ function App() {
               <Route path="products/:id" element={<ProductDetailPage />} />
               <Route path="cart" element={<CartPage />} />
               <Route path="wishlist" element={<WishlistPage />} />
-              <Route path="checkout" element={<CheckoutPage />} />
-              <Route path="order-confirmation" element={<OrderConfirmationPage />} />
+              <Route path="checkout" element={<AuthProtected><CheckoutPage /></AuthProtected>} />
+              <Route path="order-confirmation" element={<AuthProtected><OrderConfirmationPage /></AuthProtected>} />
               <Route path="custom-stitching" element={<CustomStitchingPage />} />
               <Route path="custom-stitching/design/:id" element={<DesignDetailPage />} />
               <Route path="custom-stitching/category/:category" element={<DesignCategoryPage />} />
@@ -58,7 +59,7 @@ function App() {
               <Route path="*" element={<NotFound />} />
             </Route>
             
-            <Route path="/admin" element={<AdminLayout />}>
+            <Route path="/admin" element={<AuthProtected><AdminLayout /></AuthProtected>}>
               <Route index element={<AdminDashboardPage />} />
               <Route path="products" element={<AdminProductsPage />} />
               <Route path="orders" element={<AdminOrdersPage />} />

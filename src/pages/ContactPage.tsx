@@ -88,23 +88,16 @@ const ContactPage = () => {
             <div className="space-y-6">
               <div className="flex items-start">
                 <div className="bg-brand-gold rounded-full p-3 mr-4">
-                  <Phone className="h-6 w-6 text-white" />
+                  <MessageCircle className="h-6 w-6 text-white" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-lg">Phone</h3>
-                  <p className="text-gray-600 dark:text-gray-300">+92 300 1234567</p>
-                  <p className="text-gray-600 dark:text-gray-300">Mon-Fri: 9:00 AM - 6:00 PM</p>
-                </div>
-              </div>
-              
-              <div className="flex items-start">
-                <div className="bg-brand-gold rounded-full p-3 mr-4">
-                  <Mail className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-lg">Email</h3>
-                  <p className="text-gray-600 dark:text-gray-300">info@stitchery-boutique.com</p>
-                  <p className="text-gray-600 dark:text-gray-300">support@stitchery-boutique.com</p>
+                  <h3 className="font-semibold text-lg">WhatsApp</h3>
+                  <p className="text-gray-600 dark:text-gray-300">
+                    <a href="https://wa.me/03070125274">03070125274</a>
+                  </p>
+                  <p className="text-gray-600 dark:text-gray-300">
+                    <a href="https://wa.me/03343233883">03343233883</a>
+                  </p>
                 </div>
               </div>
               
@@ -115,7 +108,7 @@ const ContactPage = () => {
                 <div>
                   <h3 className="font-semibold text-lg">Location</h3>
                   <p className="text-gray-600 dark:text-gray-300">
-                    123 Fashion Street, Lahore
+                    Mahmoodabad No 04 Karachi
                   </p>
                   <p className="text-gray-600 dark:text-gray-300">
                     Pakistan

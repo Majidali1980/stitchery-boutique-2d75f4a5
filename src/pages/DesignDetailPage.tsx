@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { 
   Card, 
   CardContent, 
@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { toast } from "@/components/ui/use-toast";
 import { 
   ArrowLeft, 
   Check, 
@@ -84,6 +85,98 @@ const getDesignById = (id: string): CustomDesign | undefined => {
       reviews: mockReviews,
       designCode: "SC-001"
     },
+    // Suit designs
+    {
+      id: "suit-2",
+      name: "Modern Embroidery",
+      type: "suit",
+      category: "Formal",
+      imageUrl: "https://github.com/Majidali1980/lmages/blob/main/1%20(11).jpeg?raw=true",
+      description: "Contemporary design with subtle embroidery details",
+      price: 12500,
+      designCode: "SR-002",
+      details: "A contemporary take on traditional embroidery, this suit features subtle yet elegant details.",
+      features: ["Contemporary design", "Subtle embroidery", "Premium fabric"],
+      materials: ["Premium cotton", "High-quality thread"],
+      stitchingOptions: ["Standard", "Premium", "Rush delivery"],
+      reviews: mockReviews
+    },
+    {
+      id: "suit-3",
+      name: "Formal Elegance",
+      type: "suit",
+      category: "Formal",
+      imageUrl: "https://github.com/Majidali1980/lmages/blob/main/1%20(13).jpeg?raw=true",
+      description: "Sophisticated formal wear with premium stitching",
+      price: 18000,
+      designCode: "SR-003",
+      details: "An elegant formal suit with premium stitching and attention to detail.",
+      features: ["Premium stitching", "Formal design", "Quality fabric"],
+      materials: ["Premium cotton", "Silk thread"],
+      stitchingOptions: ["Standard", "Premium", "Rush delivery"],
+      reviews: mockReviews
+    },
+    {
+      id: "shirt-2",
+      name: "Modern Cut",
+      type: "shirt",
+      category: "Modern",
+      imageUrl: "https://github.com/Majidali1980/lmages/blob/main/1%20(6).jpeg?raw=true",
+      description: "Contemporary cut with clean lines",
+      price: 5000,
+      designCode: "SC-002",
+      details: "A modern shirt with clean lines and contemporary styling.",
+      features: ["Modern cut", "Clean lines", "Comfortable fit"],
+      materials: ["Premium cotton", "Quality buttons"],
+      stitchingOptions: ["Standard", "Premium", "Rush delivery"],
+      reviews: mockReviews
+    },
+    {
+      id: "shirt-3",
+      name: "Embroidered Collar",
+      type: "shirt",
+      category: "Premium",
+      imageUrl: "https://github.com/Majidali1980/lmages/blob/main/1%20(10).jpeg?raw=true",
+      description: "Detailed embroidery around collar and cuffs",
+      price: 6500,
+      designCode: "SC-003",
+      details: "Features detailed embroidery around the collar and cuffs for a premium look.",
+      features: ["Embroidered collar", "Embroidered cuffs", "Premium fabric"],
+      materials: ["Premium cotton", "Silk thread"],
+      stitchingOptions: ["Standard", "Premium", "Rush delivery"],
+      reviews: mockReviews
+    },
+    // Additional designs
+    {
+      id: "suit-4",
+      name: "Wedding Collection",
+      type: "suit",
+      category: "Wedding",
+      imageUrl: "https://github.com/Majidali1980/lmages/blob/main/1%20(14).jpeg?raw=true",
+      description: "Perfect for special occasions and celebrations",
+      price: 22000,
+      designCode: "SR-004",
+      details: "A luxurious suit designed specifically for weddings and special occasions.",
+      features: ["Wedding design", "Luxury fabric", "Premium stitching"],
+      materials: ["Premium cotton", "Gold thread"],
+      stitchingOptions: ["Standard", "Premium", "Rush delivery"],
+      reviews: mockReviews
+    },
+    {
+      id: "shirt-7",
+      name: "Premium Cotton",
+      type: "shirt",
+      category: "Premium",
+      imageUrl: "https://github.com/Majidali1980/lmages/blob/main/1%20(22).jpeg?raw=true",
+      description: "Made with the finest cotton for superior comfort",
+      price: 6000,
+      designCode: "SC-007",
+      details: "Our premium cotton shirt offers superior comfort and durability.",
+      features: ["Premium cotton", "Superior comfort", "Durable design"],
+      materials: ["Premium cotton", "Quality buttons"],
+      stitchingOptions: ["Standard", "Premium", "Rush delivery"],
+      reviews: mockReviews
+    },
   ];
   
   return allDesigns.find(design => design.id === id);
@@ -110,7 +203,10 @@ const ReviewForm = ({ designId }: { designId: string }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Here you would handle submitting the review to your backend
-    alert("Thank you for your review! It will be visible after moderation.");
+    toast({
+      title: "Review submitted!",
+      description: "Thank you for your review! It will be visible after moderation."
+    });
     setName("");
     setComment("");
     setRating(5);
@@ -169,6 +265,7 @@ const DesignDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const [design, setDesign] = useState<CustomDesign | undefined>();
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
   
   useEffect(() => {
     // Simulate API call
@@ -181,6 +278,17 @@ const DesignDetailPage = () => {
       setIsLoading(false);
     }, 500);
   }, [id]);
+  
+  const handleBuyNow = () => {
+    if (design) {
+      toast({
+        title: "Item added to cart!",
+        description: `${design.name} has been added to your cart.`
+      });
+      // Navigate to checkout page
+      navigate('/checkout');
+    }
+  };
   
   if (isLoading) {
     return (
@@ -200,9 +308,14 @@ const DesignDetailPage = () => {
       <div className="container py-16 text-center">
         <h1 className="text-3xl font-bold mb-4">Design Not Found</h1>
         <p className="mb-8">The design you're looking for doesn't exist or has been removed.</p>
-        <Button asChild>
-          <Link to="/custom-stitching">Browse All Designs</Link>
-        </Button>
+        <div className="flex justify-center space-x-4">
+          <Button asChild className="bg-brand-gold hover:bg-brand-gold/90">
+            <Link to="/custom-stitching">Browse All Designs</Link>
+          </Button>
+          <Button variant="outline" asChild>
+            <Link to="/">Return to Home</Link>
+          </Button>
+        </div>
       </div>
     );
   }
@@ -268,6 +381,16 @@ const DesignDetailPage = () => {
                 <Scissors className="mr-2 h-5 w-5" />
                 Select for Custom Stitching
               </Link>
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              size="lg" 
+              onClick={handleBuyNow}
+              className="border-brand-gold text-brand-gold hover:bg-brand-gold hover:text-white"
+            >
+              <ShoppingBag className="mr-2 h-5 w-5" />
+              Buy Now
             </Button>
             
             <Button variant="outline" size="lg" onClick={handleShareDesign}>

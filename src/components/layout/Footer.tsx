@@ -1,6 +1,7 @@
+
 import { Link } from "react-router-dom";
 import { 
-  Mail, Phone, MapPin, Facebook, Instagram, MessageCircle
+  Phone, MapPin, Facebook, Instagram, MessageCircle
 } from "lucide-react";
 
 const Footer = () => {
@@ -50,6 +51,11 @@ const Footer = () => {
               <li>
                 <Link to="/products" className="text-gray-300 hover:text-brand-gold text-sm">
                   Products
+                </Link>
+              </li>
+              <li>
+                <Link to="/custom-stitching" className="text-gray-300 hover:text-brand-gold text-sm">
+                  Custom Stitching
                 </Link>
               </li>
               <li>
@@ -103,22 +109,16 @@ const Footer = () => {
                 </span>
               </li>
               <li className="flex items-center space-x-2">
-                <Phone size={18} className="text-brand-gold" />
-                <span className="text-sm text-gray-300">
-                  03070125274
-                </span>
+                <MessageCircle size={18} className="text-brand-gold" />
+                <a href="https://wa.me/03070125274" className="text-sm text-gray-300 hover:text-brand-gold">
+                  03070125274 (WhatsApp)
+                </a>
               </li>
               <li className="flex items-center space-x-2">
                 <MessageCircle size={18} className="text-brand-gold" />
-                <span className="text-sm text-gray-300">
-                  03343233883
-                </span>
-              </li>
-              <li className="flex items-center space-x-2">
-                <Mail size={18} className="text-brand-gold" />
-                <span className="text-sm text-gray-300">
-                  info@matailor.com
-                </span>
+                <a href="https://wa.me/03343233883" className="text-sm text-gray-300 hover:text-brand-gold">
+                  03343233883 (WhatsApp)
+                </a>
               </li>
             </ul>
           </div>
