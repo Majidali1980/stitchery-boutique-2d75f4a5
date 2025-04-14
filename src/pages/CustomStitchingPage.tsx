@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { 
   Form, 
   FormControl, 
@@ -21,10 +21,9 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "@/components/ui/use-toast";
 import { useCart } from "@/context/CartContext";
 import { Ruler, Shirt, Scissors, Upload } from 'lucide-react';
-import { ServiceType } from '@/types';
+import { ServiceType, CustomStitchingOrder } from '@/types/stitching';
 import { stitchingServices, shirtServices, bottomServices } from '@/data/services';
 
-// Define the measurement schema based on the garment type
 const shirtMeasurementsSchema = z.object({
   shoulder: z.string().refine(val => !isNaN(Number(val)), "Must be a number"),
   chest: z.string().refine(val => !isNaN(Number(val)), "Must be a number"),
@@ -48,8 +47,30 @@ const CustomStitchingPage = () => {
   const [selectedServiceType, setSelectedServiceType] = useState<ServiceType>("standard");
   const [designImage, setDesignImage] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [selectedDesignId, setSelectedDesignId] = useState<string | null>(null);
+  const location = useLocation();
 
-  // Determine which schema to use based on garment type
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const designId = searchParams.get('designId');
+    const designType = searchParams.get('type');
+    
+    if (designId) {
+      setSelectedDesignId(designId);
+      
+      if (designType === 'shirt') {
+        setSelectedGarmentType('shirt');
+      } else if (designType === 'suit') {
+        setSelectedGarmentType('complete-suit');
+      }
+      
+      toast({
+        title: "Design Selected",
+        description: `Design ${designId} has been selected for your stitching order.`,
+      });
+    }
+  }, [location]);
+
   let schema;
   if (selectedGarmentType === "shirt") {
     schema = z.object({
@@ -66,7 +87,6 @@ const CustomStitchingPage = () => {
       notes: z.string().optional(),
     });
   } else {
-    // Complete suit requires both measurement sets
     schema = z.object({
       serviceType: z.string(),
       shirtMeasurements: shirtMeasurementsSchema,
@@ -76,7 +96,6 @@ const CustomStitchingPage = () => {
     });
   }
 
-  // Initialize form with the schema
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: selectedGarmentType === "complete-suit" ? {
@@ -151,37 +170,33 @@ const CustomStitchingPage = () => {
     } else if (selectedGarmentType === "shalwar" || selectedGarmentType === "pajama") {
       selectedService = bottomServices.find(s => s.id === selectedServiceType) || bottomServices[0];
     } else {
-      // Complete suit
       selectedService = stitchingServices.find(s => s.id === selectedServiceType);
     }
     return selectedService ? selectedService.price : 0;
   };
 
   const onSubmit = (data: z.infer<typeof schema>) => {
-    // Process form data to create stitching order
     const measurements = selectedGarmentType === "complete-suit" ? 
       { ...data.shirtMeasurements as any, ...data.bottomMeasurements as any } :
       { ...data.measurements as any };
       
-    // Convert string measurements to numbers
     const numericMeasurements: Record<string, number> = {};
     Object.entries(measurements).forEach(([key, value]) => {
       numericMeasurements[key] = parseFloat(value as string);
     });
     
-    // Create stitching order
-    const stitchingOrder = {
+    const stitchingOrder: Omit<CustomStitchingOrder, "id" | "customerId" | "customerName" | "customerPhone" | "customerEmail" | "status" | "createdAt"> = {
       garmentType: selectedGarmentType,
-      serviceType: selectedServiceType as ServiceType,
+      serviceType: selectedServiceType,
       measurements: numericMeasurements,
       fabric: data.fabric,
       designImage: designImage,
       notes: data.notes,
       price: getServicePrice(),
-      estimatedDelivery: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString()
+      estimatedDelivery: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+      designId: selectedDesignId || undefined
     };
 
-    // Add to cart
     addStitchingToCart(stitchingOrder);
 
     toast({
@@ -189,9 +204,9 @@ const CustomStitchingPage = () => {
       description: "Your custom stitching order has been added to the cart.",
     });
 
-    // Reset form
     form.reset();
     setDesignImage(null);
+    setSelectedDesignId(null);
   };
 
   const getServicesForGarmentType = () => {
@@ -212,10 +227,17 @@ const CustomStitchingPage = () => {
       <div className="text-center mb-10">
         <h1 className="text-3xl font-semibold heading-fancy">Custom Stitching</h1>
         <div className="w-24 h-1 bg-brand-gold mx-auto mt-4"></div>
-        <p className="text-gray-600 mt-4 max-w-2xl mx-auto">
+        <p className="text-gray-600 dark:text-gray-300 mt-4 max-w-2xl mx-auto">
           Get your garments custom stitched by our expert tailors. Provide your measurements
           or use our standard size chart as reference.
         </p>
+        
+        {selectedDesignId && (
+          <div className="mt-4 p-3 bg-brand-gold/10 border border-brand-gold rounded-md inline-block">
+            <p className="text-brand-gold font-medium">Design #{selectedDesignId} selected</p>
+          </div>
+        )}
+        
         <div className="mt-4">
           <Button variant="outline" asChild className="mr-2">
             <Link to="/size-chart">
@@ -223,11 +245,16 @@ const CustomStitchingPage = () => {
               View Size Chart
             </Link>
           </Button>
+          <Button variant="outline" asChild>
+            <Link to="/custom-stitching/designs">
+              <Shirt className="mr-2 h-4 w-4" />
+              Browse Design Collections
+            </Link>
+          </Button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Garment Type Selection */}
         <div className="lg:col-span-1">
           <Card>
             <CardHeader>
@@ -317,7 +344,6 @@ const CustomStitchingPage = () => {
           </Card>
         </div>
 
-        {/* Measurement Form */}
         <div className="lg:col-span-2">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
@@ -332,7 +358,6 @@ const CustomStitchingPage = () => {
             <CardContent>
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                  {/* Complete Suit Form */}
                   {selectedGarmentType === "complete-suit" && (
                     <Tabs defaultValue="shirt" className="w-full">
                       <TabsList className="grid w-full grid-cols-2">
@@ -495,7 +520,6 @@ const CustomStitchingPage = () => {
                     </Tabs>
                   )}
 
-                  {/* Shirt Only Form */}
                   {selectedGarmentType === "shirt" && (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <FormField
@@ -579,7 +603,6 @@ const CustomStitchingPage = () => {
                     </div>
                   )}
 
-                  {/* Bottom (Shalwar/Pajama) Form */}
                   {(selectedGarmentType === "shalwar" || selectedGarmentType === "pajama") && (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <FormField
@@ -652,7 +675,6 @@ const CustomStitchingPage = () => {
 
                   <Separator />
 
-                  {/* Additional Details */}
                   <div>
                     <h3 className="font-medium mb-4">Additional Details</h3>
 
@@ -672,7 +694,6 @@ const CustomStitchingPage = () => {
                       />
                     </div>
 
-                    {/* Design Image Upload */}
                     <div className="mb-6">
                       <FormLabel className="block mb-2">Design Reference Image (Optional)</FormLabel>
                       <div className="flex items-center">

@@ -17,7 +17,8 @@ import {
   Info, 
   Ruler, 
   Share2, 
-  ShoppingBag 
+  ShoppingBag,
+  Scissors
 } from "lucide-react";
 import { CustomDesign } from '@/types/stitching';
 
@@ -95,7 +96,7 @@ const DesignDetailPage = () => {
     if (navigator.share) {
       navigator.share({
         title: design.name,
-        text: design.description,
+        text: design.description || 'Check out this design from our collection',
         url: window.location.href,
       });
     }
@@ -103,6 +104,16 @@ const DesignDetailPage = () => {
   
   return (
     <div className="container py-16">
+      {/* Marquee for promotions */}
+      <div className="bg-brand-gold text-white py-3 px-4 mb-8 overflow-hidden whitespace-nowrap">
+        <div className="animate-marquee inline-block">
+          🧵 Design Code: {design.id} • Select this design for custom stitching • Free shipping on orders over Rs.15000 • Custom stitching available for all designs • 
+        </div>
+        <div className="animate-marquee inline-block absolute">
+          🧵 Design Code: {design.id} • Select this design for custom stitching • Free shipping on orders over Rs.15000 • Custom stitching available for all designs • 
+        </div>
+      </div>
+      
       <div className="mb-8">
         <Button variant="ghost" asChild className="mb-4">
           <Link to="/custom-stitching">
@@ -112,26 +123,31 @@ const DesignDetailPage = () => {
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="rounded-lg overflow-hidden border-2 border-gray-100 dark:border-gray-800">
+        <div className="rounded-lg overflow-hidden border-2 border-gray-100 dark:border-gray-800 relative">
           <img 
             src={design.imageUrl} 
             alt={design.name} 
             className="w-full h-auto object-cover"
           />
+          <div className="absolute top-4 right-4 bg-brand-gold text-white px-3 py-2 rounded-full">
+            <span className="font-bold">Code: {design.id}</span>
+          </div>
         </div>
         
         <div>
           <h1 className="text-3xl font-bold mb-2">{design.name}</h1>
           <p className="text-lg text-gray-600 dark:text-gray-300 mb-4">{design.description}</p>
           
-          {design.price && (
-            <p className="text-2xl font-bold mb-6">Rs. {design.price.toLocaleString()}</p>
-          )}
-          
           <div className="flex flex-wrap gap-4 mb-8">
-            <Button size="lg" className="bg-brand-gold hover:bg-brand-gold/90 text-white">
-              <ShoppingBag className="mr-2 h-5 w-5" />
-              Select This Design
+            <Button 
+              size="lg" 
+              className="bg-brand-gold hover:bg-brand-gold/90 text-white"
+              asChild
+            >
+              <Link to={`/custom-stitching?designId=${design.id}&type=${design.type}`}>
+                <Scissors className="mr-2 h-5 w-5" />
+                Select for Custom Stitching
+              </Link>
             </Button>
             
             <Button variant="outline" size="lg" onClick={handleShareDesign}>
@@ -150,7 +166,7 @@ const DesignDetailPage = () => {
           <div className="space-y-6">
             <div>
               <h3 className="text-xl font-semibold mb-2">Design Details</h3>
-              <p className="text-gray-600 dark:text-gray-300">{design.details}</p>
+              <p className="text-gray-600 dark:text-gray-300">{design.details || 'No detailed description available for this design.'}</p>
             </div>
             
             <div>
@@ -187,9 +203,9 @@ const DesignDetailPage = () => {
             </CardHeader>
             <CardContent>
               <ol className="list-decimal list-inside space-y-2 text-sm">
-                <li>Select this design</li>
-                <li>Choose your fabric (optional)</li>
+                <li>Select this design for custom stitching</li>
                 <li>Provide your measurements or select standard size</li>
+                <li>Choose your fabric (optional)</li>
                 <li>Add any special requirements</li>
                 <li>Complete your order</li>
               </ol>

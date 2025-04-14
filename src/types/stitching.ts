@@ -16,22 +16,29 @@ export interface GarmentSizeChart {
 export type ServiceType = "standard" | "custom" | "premium";
 
 export interface CustomStitchingOrder {
-  id: string;
-  customerId: string;
-  customerName: string;
-  customerPhone: string;
-  customerEmail: string;
+  id?: string;
+  customerId?: string;
+  customerName?: string;
+  customerPhone?: string;
+  customerEmail?: string;
   garmentType: "shirt" | "shalwar" | "pajama" | "complete-suit";
   serviceType: ServiceType;
-  status: "pending" | "processing" | "ready" | "completed" | "cancelled";
+  status?: "pending" | "processing" | "ready" | "completed" | "cancelled";
   price: number;
-  createdAt: string;
+  createdAt?: string;
   measurements: { [key: string]: number };
   fabric?: string;
   designImage?: string;
   notes?: string;
   estimatedDelivery: string;
   completedAt?: string;
+  designId?: string; // Reference to the design selected
+}
+
+export interface ExtendedCustomStitchingOrder extends CustomStitchingOrder {
+  id: string; // Required in the extended version
+  status: "pending" | "processing" | "ready" | "completed" | "cancelled"; // Required
+  createdAt: string; // Required
 }
 
 export interface CustomDesign {

@@ -1,4 +1,3 @@
-
 import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { 
@@ -23,8 +22,9 @@ const DesignCarousel: React.FC<DesignCarouselProps> = ({ title, designs, type })
   const [activeIndex, setActiveIndex] = useState(0);
   const carouselRef = useRef(null);
 
-  const handleSelect = (index: number) => {
-    setActiveIndex(index);
+  const handleSelect = (event: React.SyntheticEvent<HTMLDivElement, Event>) => {
+    // We'll get the index from the Embla API in a real implementation
+    // For now we'll keep the current activeIndex functionality
   };
 
   return (
@@ -37,13 +37,22 @@ const DesignCarousel: React.FC<DesignCarouselProps> = ({ title, designs, type })
           </Link>
         </div>
 
+        <div className="bg-brand-gold text-white py-3 px-4 mb-8 overflow-hidden whitespace-nowrap">
+          <div className="animate-marquee inline-block">
+            🧵 Choose from our premium design collection for custom stitching • Each design has a unique code for easy reference • Free shipping on orders over Rs.15000 • 
+          </div>
+          <div className="animate-marquee inline-block absolute">
+            🧵 Choose from our premium design collection for custom stitching • Each design has a unique code for easy reference • Free shipping on orders over Rs.15000 • 
+          </div>
+        </div>
+
         <Carousel
           ref={carouselRef}
           className="w-full"
           onSelect={handleSelect}
         >
           <CarouselContent>
-            {designs.map((design) => (
+            {designs.map((design, index) => (
               <CarouselItem key={design.id} className="md:basis-1/2 lg:basis-1/3 pl-4">
                 <Card className="overflow-hidden border-2 hover:border-brand-gold transition-all duration-300 h-full">
                   <div className="aspect-square relative overflow-hidden">
@@ -52,6 +61,9 @@ const DesignCarousel: React.FC<DesignCarouselProps> = ({ title, designs, type })
                       alt={design.name}
                       className="object-cover w-full h-full transition-transform duration-300 hover:scale-105"
                     />
+                    <div className="absolute top-0 right-0 bg-brand-gold text-white px-2 py-1 text-sm font-bold">
+                      Code: {design.id}
+                    </div>
                   </div>
                   <CardContent className="p-4">
                     <h3 className="text-xl font-semibold">{design.name}</h3>
@@ -60,15 +72,12 @@ const DesignCarousel: React.FC<DesignCarouselProps> = ({ title, designs, type })
                     )}
                   </CardContent>
                   <CardFooter className="p-4 pt-0 flex justify-between items-center">
-                    {design.price && (
-                      <span className="font-semibold">Rs. {design.price.toLocaleString()}</span>
-                    )}
                     <Button 
                       asChild 
-                      className="bg-brand-gold hover:bg-brand-gold/90 text-white"
+                      className="bg-brand-gold hover:bg-brand-gold/90 text-white w-full"
                     >
                       <Link to={`/custom-stitching/design/${design.id}`}>
-                        Select Design
+                        View Design
                       </Link>
                     </Button>
                   </CardFooter>

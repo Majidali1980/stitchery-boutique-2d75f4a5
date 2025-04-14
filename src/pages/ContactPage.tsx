@@ -1,258 +1,242 @@
 
-import { useState } from "react";
-import { Mail, Phone, MapPin, Send } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useState } from 'react';
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
+import { Mail, Phone, MapPin, MessageCircle } from 'lucide-react';
+import emailjs from '@emailjs/browser';
+
+const formSchema = z.object({
+  name: z.string().min(2, { message: "Name must be at least 2 characters" }),
+  email: z.string().email({ message: "Please enter a valid email address" }),
+  phone: z.string().optional(),
+  subject: z.string().min(5, { message: "Subject must be at least 5 characters" }),
+  message: z.string().min(10, { message: "Message must be at least 10 characters" }),
+});
+
+type FormValues = z.infer<typeof formSchema>;
 
 const ContactPage = () => {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    subject: "",
-    message: ""
-  });
-  
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-  
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Simple validation
-    if (!formData.name || !formData.email || !formData.message) {
-      toast({
-        title: "Error",
-        description: "Please fill in all required fields",
-        variant: "destructive"
-      });
-      return;
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
+      subject: "",
+      message: ""
     }
-    
-    // Simulate form submission
+  });
+
+  const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
     
-    setTimeout(() => {
+    try {
+      const result = await emailjs.send(
+        'service_kqtecnn', // Service ID
+        'template_tv45p3s', // Template ID
+        {
+          from_name: data.name,
+          from_email: data.email,
+          phone: data.phone,
+          subject: data.subject,
+          message: data.message
+        },
+        'H357zAP8V__yP5H8e' // Public Key
+      );
+      
       toast({
-        title: "Message Sent",
-        description: "We'll get back to you as soon as possible!",
+        title: "Message sent successfully!",
+        description: "We'll get back to you as soon as possible.",
+        variant: "default"
       });
       
-      setFormData({
-        name: "",
-        email: "",
-        phone: "",
-        subject: "",
-        message: ""
+      form.reset();
+    } catch (error) {
+      console.error('Error sending email:', error);
+      toast({
+        title: "Failed to send message",
+        description: "Please try again later or contact us directly.",
+        variant: "destructive"
       });
-      
-      setIsSubmitting(false);
-    }, 1500);
+    }
+    
+    setIsSubmitting(false);
   };
   
   return (
-    <div>
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-r from-[#8B5CF6] to-[#D946EF] py-16 overflow-hidden">
-        <div className="container relative z-10">
-          <div className="max-w-2xl mx-auto text-center text-white">
-            <h1 className="text-4xl font-bold mb-4">Contact Us</h1>
-            <p className="text-lg">
-              Have questions or need assistance? We're here to help!
-            </p>
-          </div>
-        </div>
-        
-        <div className="absolute inset-0 z-0 opacity-20">
-          <div className="absolute top-0 left-0 w-40 h-40 bg-white rounded-full filter blur-3xl"></div>
-          <div className="absolute bottom-0 right-0 w-60 h-60 bg-white rounded-full filter blur-3xl"></div>
-        </div>
-      </section>
+    <div className="container py-16">
+      <div className="text-center mb-12">
+        <h1 className="text-4xl font-bold mb-4">Contact Us</h1>
+        <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+          Have questions or need assistance? Reach out to our customer service team and we'll be happy to help.
+        </p>
+      </div>
       
-      {/* Contact Info & Form */}
-      <section className="py-16">
-        <div className="container">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-            {/* Contact Information */}
-            <div>
-              <h2 className="text-3xl font-semibold heading-fancy mb-6">Get in Touch</h2>
-              <div className="w-24 h-1 bg-brand-gold mb-6"></div>
-              
-              <p className="text-gray-600 mb-8">
-                Whether you have a question about our products, custom stitching services, 
-                or anything else, our team is ready to answer all your questions.
-              </p>
-              
-              <div className="space-y-6 mb-8">
-                <div className="flex">
-                  <div className="flex-shrink-0 h-12 w-12 bg-purple-100 rounded-full flex items-center justify-center mr-4">
-                    <MapPin className="h-5 w-5 text-brand-purple" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-medium">Our Location</h3>
-                    <p className="text-gray-600 mt-1">Mahmoodabad No 04 Karachi, Pakistan</p>
-                  </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+        <div>
+          <div className="bg-gray-50 dark:bg-gray-800 p-8 rounded-lg">
+            <h2 className="text-2xl font-bold mb-6">Get In Touch</h2>
+            
+            <div className="space-y-6">
+              <div className="flex items-start">
+                <div className="bg-brand-gold rounded-full p-3 mr-4">
+                  <Phone className="h-6 w-6 text-white" />
                 </div>
-                
-                <div className="flex">
-                  <div className="flex-shrink-0 h-12 w-12 bg-pink-100 rounded-full flex items-center justify-center mr-4">
-                    <Phone className="h-5 w-5 text-brand-pink" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-medium">Phone Number</h3>
-                    <p className="text-gray-600 mt-1">+92 307 0125273</p>
-                  </div>
-                </div>
-                
-                <div className="flex">
-                  <div className="flex-shrink-0 h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
-                    <Mail className="h-5 w-5 text-brand-teal" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-medium">Email Address</h3>
-                    <p className="text-gray-600 mt-1">info@matailor.com</p>
-                  </div>
+                <div>
+                  <h3 className="font-semibold text-lg">Phone</h3>
+                  <p className="text-gray-600 dark:text-gray-300">+92 300 1234567</p>
+                  <p className="text-gray-600 dark:text-gray-300">Mon-Fri: 9:00 AM - 6:00 PM</p>
                 </div>
               </div>
               
-              <div className="bg-gray-50 p-6 rounded-lg border border-gray-100">
-                <h3 className="text-lg font-medium mb-3">Business Hours</h3>
-                <div className="space-y-2 text-gray-600">
-                  <div className="flex justify-between">
-                    <span>Monday - Friday:</span>
-                    <span>9:00 AM - 8:00 PM</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Saturday:</span>
-                    <span>10:00 AM - 6:00 PM</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Sunday:</span>
-                    <span>Closed</span>
-                  </div>
+              <div className="flex items-start">
+                <div className="bg-brand-gold rounded-full p-3 mr-4">
+                  <Mail className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-lg">Email</h3>
+                  <p className="text-gray-600 dark:text-gray-300">info@stitchery-boutique.com</p>
+                  <p className="text-gray-600 dark:text-gray-300">support@stitchery-boutique.com</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start">
+                <div className="bg-brand-gold rounded-full p-3 mr-4">
+                  <MapPin className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-lg">Location</h3>
+                  <p className="text-gray-600 dark:text-gray-300">
+                    123 Fashion Street, Lahore
+                  </p>
+                  <p className="text-gray-600 dark:text-gray-300">
+                    Pakistan
+                  </p>
                 </div>
               </div>
             </div>
             
-            {/* Contact Form */}
-            <div>
-              <div className="bg-white p-8 rounded-lg shadow-md border border-gray-100">
-                <h2 className="text-2xl font-semibold mb-6">Send us a Message</h2>
-                
-                <form onSubmit={handleSubmit}>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                    <div>
-                      <Label htmlFor="name">
-                        Your Name <span className="text-red-500">*</span>
-                      </Label>
-                      <Input
-                        id="name"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        placeholder="Enter your name"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="email">
-                        Email Address <span className="text-red-500">*</span>
-                      </Label>
-                      <Input
-                        id="email"
-                        name="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        placeholder="Enter your email"
-                        required
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                    <div>
-                      <Label htmlFor="phone">Phone Number</Label>
-                      <Input
-                        id="phone"
-                        name="phone"
-                        value={formData.phone}
-                        onChange={handleChange}
-                        placeholder="Enter your phone number"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="subject">Subject</Label>
-                      <Input
-                        id="subject"
-                        name="subject"
-                        value={formData.subject}
-                        onChange={handleChange}
-                        placeholder="What is this about?"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="mb-6">
-                    <Label htmlFor="message">
-                      Your Message <span className="text-red-500">*</span>
-                    </Label>
-                    <Textarea
-                      id="message"
-                      name="message"
-                      value={formData.message}
-                      onChange={handleChange}
-                      placeholder="Enter your message"
-                      rows={6}
-                      required
-                    />
-                  </div>
-                  
-                  <Button 
-                    type="submit" 
-                    className="bg-brand-gold hover:bg-brand-gold/90 w-full sm:w-auto"
-                    size="lg"
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? (
-                      <>Sending...</>
-                    ) : (
-                      <>
-                        Send Message <Send className="ml-2 h-4 w-4" />
-                      </>
-                    )}
-                  </Button>
-                </form>
+            <div className="mt-8">
+              <h3 className="font-semibold text-lg mb-4">Business Hours</h3>
+              <div className="grid grid-cols-2 gap-2">
+                <div>Monday - Friday</div>
+                <div>9:00 AM - 6:00 PM</div>
+                <div>Saturday</div>
+                <div>10:00 AM - 4:00 PM</div>
+                <div>Sunday</div>
+                <div>Closed</div>
               </div>
             </div>
           </div>
         </div>
-      </section>
-      
-      {/* Map */}
-      <section className="py-10">
-        <div className="container">
-          <div className="aspect-[21/9] rounded-lg overflow-hidden">
-            <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14473.362775752683!2d67.0591335!3d24.8826142!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3eb33e70a31f45d5%3A0x2e16efc984569caa!2sMahmoodabad%2C%20Karachi%2C%20Karachi%20City%2C%20Sindh%2C%20Pakistan!5e0!3m2!1sen!2s!4v1650182345678!5m2!1sen!2s"
-              width="100%"
-              height="100%"
-              style={{ border: 0 }}
-              allowFullScreen
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              title="MA Tailor Location"
-            ></iframe>
+        
+        <div>
+          <div className="bg-white dark:bg-gray-900 p-8 rounded-lg border dark:border-gray-700">
+            <h2 className="text-2xl font-bold mb-6 flex items-center">
+              <MessageCircle className="h-6 w-6 mr-2 text-brand-gold" />
+              Send us a Message
+            </h2>
+            
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Your name" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Your email" type="email" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="phone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Phone (Optional)</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Your phone number" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="subject"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Subject</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Message subject" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                
+                <FormField
+                  control={form.control}
+                  name="message"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Message</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="How can we help you?" 
+                          className="min-h-[150px] resize-none" 
+                          {...field} 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <Button 
+                  type="submit" 
+                  className="w-full bg-brand-gold hover:bg-brand-gold/90 text-white"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Sending..." : "Send Message"}
+                </Button>
+              </form>
+            </Form>
           </div>
         </div>
-      </section>
+      </div>
     </div>
   );
 };
