@@ -120,6 +120,19 @@ export const products: Product[] = [
   }
 ];
 
+// Helper function to get price based on size
+export const getSizeAdjustedPrice = (basePrice: number, size: string): number => {
+  switch(size) {
+    case "XS": return basePrice - 200;
+    case "S": return basePrice;
+    case "M": return basePrice + 300;
+    case "L": return basePrice + 600;
+    case "XL": return basePrice + 900;
+    case "XXL": return basePrice + 1200;
+    default: return basePrice;
+  }
+};
+
 export const getProductById = (id: string) => {
   return products.find(product => product.id === id);
 };
@@ -134,4 +147,15 @@ export const getProductsByCategory = (category: string) => {
 
 export const getProductsByType = (type: "ready-to-wear" | "unstitched") => {
   return products.filter(product => product.type === type);
+};
+
+// Get price variations for a product
+export const getProductPriceVariations = (productId: string): { size: string, price: number }[] | null => {
+  const product = getProductById(productId);
+  if (!product || !product.sizes) return null;
+  
+  return product.sizes.map(size => ({
+    size,
+    price: getSizeAdjustedPrice(product.price, size)
+  }));
 };

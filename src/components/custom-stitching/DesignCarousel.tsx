@@ -1,4 +1,5 @@
-import { useRef, useState } from "react";
+
+import { useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { 
   Carousel,
@@ -11,6 +12,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CustomDesign } from "@/types/stitching";
 import { ChevronRight } from "lucide-react";
+import Autoplay from "embla-carousel-autoplay";
 
 interface DesignCarouselProps {
   title: string;
@@ -21,8 +23,11 @@ interface DesignCarouselProps {
 const DesignCarousel: React.FC<DesignCarouselProps> = ({ title, designs, type }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const carouselRef = useRef(null);
+  const plugin = useRef(
+    Autoplay({ delay: 4000, stopOnInteraction: false })
+  );
 
-  const handleSelect = (event: React.SyntheticEvent<HTMLDivElement, Event>) => {
+  const handleSelect = () => {
     // We'll get the index from the Embla API in a real implementation
     // For now we'll keep the current activeIndex functionality
   };
@@ -39,10 +44,10 @@ const DesignCarousel: React.FC<DesignCarouselProps> = ({ title, designs, type })
 
         <div className="bg-brand-gold text-white py-3 px-4 mb-8 overflow-hidden whitespace-nowrap">
           <div className="animate-marquee inline-block">
-            🧵 Choose from our premium design collection for custom stitching • Each design has a unique code for easy reference • Free shipping on orders over Rs.15000 • 
+            🧵 Choose from our premium {type} design collection for custom stitching • Each design has a unique code for easy reference • Free shipping on orders over Rs.15000 • 
           </div>
           <div className="animate-marquee inline-block absolute">
-            🧵 Choose from our premium design collection for custom stitching • Each design has a unique code for easy reference • Free shipping on orders over Rs.15000 • 
+            🧵 Choose from our premium {type} design collection for custom stitching • Each design has a unique code for easy reference • Free shipping on orders over Rs.15000 • 
           </div>
         </div>
 
@@ -50,6 +55,7 @@ const DesignCarousel: React.FC<DesignCarouselProps> = ({ title, designs, type })
           ref={carouselRef}
           className="w-full"
           onSelect={handleSelect}
+          plugins={[plugin.current]}
         >
           <CarouselContent>
             {designs.map((design, index) => (

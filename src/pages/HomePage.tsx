@@ -6,6 +6,7 @@ import Services from "@/components/home/Services";
 import PromoBanner from "@/components/home/PromoBanner";
 import TestimonialSection from "@/components/home/TestimonialSection";
 import CustomDesigns from "@/components/custom-stitching/CustomDesigns";
+import DesignCategories from "@/components/custom-stitching/DesignCategories";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { getFeaturedProducts } from "@/data/products";
@@ -29,7 +30,19 @@ const HomePage = () => {
           </Button>
         </div>
       </div>
+
+      {/* Weekend Sale Banner */}
+      <div className="container my-12">
+        <Link to="/products" className="block">
+          <img 
+            src="https://github.com/Majidali1980/lmages/blob/main/Weekend%20Sale%20Facebook%20Cover.png?raw=true" 
+            alt="Weekend Sale" 
+            className="w-full h-auto rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300"
+          />
+        </Link>
+      </div>
       
+      <DesignCategories />
       <CustomDesigns />
       
       <PromoBanner />

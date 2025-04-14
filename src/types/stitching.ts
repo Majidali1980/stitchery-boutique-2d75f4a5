@@ -41,14 +41,29 @@ export interface ExtendedCustomStitchingOrder extends CustomStitchingOrder {
   createdAt: string; // Required
 }
 
+export interface Review {
+  id: string;
+  userId?: string;
+  userName: string;
+  rating: number;
+  comment: string;
+  date: string;
+}
+
 export interface CustomDesign {
   id: string;
   name: string;
   type: "shirt" | "suit" | "shalwar" | "pajama";
+  category?: string; // Added category field
   imageUrl: string;
   description?: string;
   price?: number;
   details?: string;
+  features?: string[];
+  materials?: string[];
+  stitchingOptions?: string[];
+  reviews?: Review[];
+  designCode?: string;
 }
 
 // Extended CartItem type that can handle both products and stitching orders

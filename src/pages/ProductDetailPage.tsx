@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { 
   Heart, ShoppingCart, Minus, Plus, Check, ArrowRight,
-  ChevronLeft, ChevronRight, Facebook, Twitter, Instagram, Share2, LinkIcon
+  ChevronLeft, ChevronRight, Facebook, Twitter, Instagram, Share2, LinkIcon, Star
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -89,6 +89,85 @@ const SizeChart = ({ type }: { type: string }) => {
   );
 };
 
+const getSizePrice = (basePrice: number, size: string): number => {
+  switch(size) {
+    case "XS": return basePrice - 200;
+    case "S": return basePrice;
+    case "M": return basePrice + 300;
+    case "L": return basePrice + 600;
+    case "XL": return basePrice + 900;
+    case "XXL": return basePrice + 1200;
+    default: return basePrice;
+  }
+};
+
+interface ReviewFormProps {
+  productId: string;
+  onSubmit: (review: {name: string, rating: number, comment: string}) => void;
+}
+
+const ReviewForm = ({ productId, onSubmit }: ReviewFormProps) => {
+  const [name, setName] = useState("");
+  const [comment, setComment] = useState("");
+  const [rating, setRating] = useState(5);
+  
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit({ name, rating, comment });
+    setName("");
+    setComment("");
+    setRating(5);
+  };
+  
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <label htmlFor="name" className="block mb-1 text-sm font-medium">Your Name</label>
+        <input
+          id="name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className="w-full p-2 border rounded-md"
+          required
+        />
+      </div>
+      
+      <div>
+        <label className="block mb-1 text-sm font-medium">Rating</label>
+        <div className="flex items-center space-x-1">
+          {[1, 2, 3, 4, 5].map((star) => (
+            <button
+              key={star}
+              type="button"
+              onClick={() => setRating(star)}
+              className="focus:outline-none"
+            >
+              <Star
+                className={`h-5 w-5 ${star <= rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
+              />
+            </button>
+          ))}
+        </div>
+      </div>
+      
+      <div>
+        <label htmlFor="comment" className="block mb-1 text-sm font-medium">Your Review</label>
+        <textarea
+          id="comment"
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+          className="w-full p-2 border rounded-md h-24"
+          required
+        />
+      </div>
+      
+      <Button type="submit" className="bg-brand-gold hover:bg-brand-gold/90 text-white">
+        Submit Review
+      </Button>
+    </form>
+  );
+};
+
 const ProductDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -105,6 +184,12 @@ const ProductDetailPage = () => {
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] || "");
   const [currentImgIndex, setCurrentImgIndex] = useState(0);
+  const [reviews, setReviews] = useState<{ name: string, rating: number, comment: string, date: string }[]>([
+    { name: "Sarah A.", rating: 5, comment: "Excellent quality and fit! Very happy with my purchase.", date: "2023-12-15" },
+    { name: "Amir K.", rating: 4, comment: "Good product, but delivery was a bit delayed.", date: "2023-11-25" },
+  ]);
+  
+  const calculatedPrice = getSizePrice(product.price, selectedSize);
   
   const incrementQuantity = () => {
     setQuantity(prev => prev + 1);
@@ -139,6 +224,18 @@ const ProductDetailPage = () => {
       description: isInWishlist(product.id) 
         ? `${product.name} is already in your wishlist` 
         : `${product.name} has been added to your wishlist`,
+    });
+  };
+  
+  const handleAddReview = (review: {name: string, rating: number, comment: string}) => {
+    const newReview = {
+      ...review,
+      date: new Date().toISOString().split('T')[0]
+    };
+    setReviews(prev => [newReview, ...prev]);
+    toast({
+      title: "Thank you for your review!",
+      description: "Your review has been submitted successfully.",
     });
   };
   
@@ -272,7 +369,12 @@ const ProductDetailPage = () => {
           <h1 className="text-3xl font-semibold mb-2">{product.name}</h1>
           
           <div className="text-2xl font-bold text-brand-gold mb-4">
-            Rs. {product.price.toLocaleString()}
+            Rs. {calculatedPrice.toLocaleString()}
+            {selectedSize && (
+              <span className="text-sm text-gray-500 ml-2">
+                (Price for size {selectedSize})
+              </span>
+            )}
           </div>
           
           <p className="text-gray-600 mb-6">{product.description}</p>
@@ -310,6 +412,9 @@ const ProductDetailPage = () => {
                   </div>
                 ))}
               </RadioGroup>
+              <p className="text-sm text-gray-500 mt-2">
+                *Price varies based on size selection
+              </p>
             </div>
           )}
           
@@ -363,7 +468,7 @@ const ProductDetailPage = () => {
             </Button>
             
             <Button
-              className="w-full sm:w-auto"
+              className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white"
               size="lg"
               asChild
             >
@@ -426,6 +531,7 @@ const ProductDetailPage = () => {
             <TabsTrigger value="description" className="text-lg">Description</TabsTrigger>
             <TabsTrigger value="sizing" className="text-lg">Sizing Guide</TabsTrigger>
             <TabsTrigger value="care" className="text-lg">Care Instructions</TabsTrigger>
+            <TabsTrigger value="reviews" className="text-lg">Reviews</TabsTrigger>
           </TabsList>
           
           <TabsContent value="description" className="py-6">
@@ -454,6 +560,18 @@ const ProductDetailPage = () => {
               {product.type === "ready-to-wear" && (
                 <SizeChart type={product.category} />
               )}
+              
+              <div className="mt-6 bg-gray-50 p-4 rounded-lg">
+                <h3 className="font-semibold mb-2">Price by Size</h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {product.sizes?.map((size) => (
+                    <div key={size} className="flex justify-between p-2 border-b">
+                      <span className="font-medium">Size {size}</span>
+                      <span>Rs. {getSizePrice(product.price, size).toLocaleString()}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </TabsContent>
           
@@ -472,6 +590,44 @@ const ProductDetailPage = () => {
               <p className="text-sm text-gray-500 mt-4">
                 Note: Colors may vary slightly from the images due to photography lighting and display settings.
               </p>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="reviews" className="py-6">
+            <div className="space-y-8">
+              <div>
+                <h3 className="text-xl font-semibold mb-4">Customer Reviews</h3>
+                {reviews.length > 0 ? (
+                  <div className="space-y-6">
+                    {reviews.map((review, index) => (
+                      <div key={index} className="border-b pb-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="font-medium">{review.name}</p>
+                            <div className="flex items-center">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <Star
+                                  key={star}
+                                  className={`h-4 w-4 ${star <= review.rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                          <p className="text-sm text-gray-500">{review.date}</p>
+                        </div>
+                        <p className="mt-2">{review.comment}</p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p>No reviews yet. Be the first to review this product!</p>
+                )}
+              </div>
+              
+              <div>
+                <h3 className="text-xl font-semibold mb-4">Write a Review</h3>
+                <ReviewForm productId={product.id} onSubmit={handleAddReview} />
+              </div>
             </div>
           </TabsContent>
         </Tabs>
