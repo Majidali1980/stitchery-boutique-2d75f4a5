@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { 
   Card, 
@@ -156,34 +155,21 @@ const mockOrders: CustomStitchingOrder[] = [
   }
 ];
 
-// Add these missing types
+// Fixed type definitions
 type OrderStatus = "pending" | "processing" | "ready" | "completed" | "cancelled";
 type SortField = "id" | "customerName" | "createdAt" | "price" | "status";
 
-interface ExtendedCustomStitchingOrder extends CustomStitchingOrder {
-  id: string;
-  customerId: string;
-  customerName: string;
-  customerPhone: string;
-  customerEmail: string;
-  status: OrderStatus;
-  price: number;
-  createdAt: string;
-  estimatedDelivery: string;
-  completedAt?: string;
-}
-
 const AdminStitchingOrdersPage = () => {
-  const [orders] = useState<ExtendedCustomStitchingOrder[]>(mockOrders);
+  const [orders, setOrders] = useState<CustomStitchingOrder[]>(mockOrders);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<OrderStatus | "all">("all");
   const [garmentFilter, setGarmentFilter] = useState<string>("all");
   const [sortField, setSortField] = useState<SortField>("createdAt");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
-  const [selectedOrder, setSelectedOrder] = useState<ExtendedCustomStitchingOrder | null>(null);
+  const [selectedOrder, setSelectedOrder] = useState<CustomStitchingOrder | null>(null);
   const [viewMode, setViewMode] = useState<"details" | "measurements">("details");
   
-  const handleViewOrder = (order: ExtendedCustomStitchingOrder) => {
+  const handleViewOrder = (order: CustomStitchingOrder) => {
     setSelectedOrder(order);
     setViewMode("details");
   };

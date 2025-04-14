@@ -23,6 +23,10 @@ const DesignCarousel: React.FC<DesignCarouselProps> = ({ title, designs, type })
   const [activeIndex, setActiveIndex] = useState(0);
   const carouselRef = useRef(null);
 
+  const handleSelect = (index: number) => {
+    setActiveIndex(index);
+  };
+
   return (
     <div className="py-12">
       <div className="container">
@@ -36,7 +40,7 @@ const DesignCarousel: React.FC<DesignCarouselProps> = ({ title, designs, type })
         <Carousel
           ref={carouselRef}
           className="w-full"
-          onSelect={(index) => setActiveIndex(index)}
+          onSelect={handleSelect}
         >
           <CarouselContent>
             {designs.map((design) => (

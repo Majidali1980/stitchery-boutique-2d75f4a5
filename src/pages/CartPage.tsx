@@ -69,7 +69,7 @@ const CartPage = () => {
                       </span>
                     </div>
                     
-                    {item.type === 'product' && (
+                    {item.type === 'product' && 'selectedSize' in item && (
                       <div className="text-sm text-gray-600 mt-1">
                         {item.selectedSize && <span className="mr-3">Size: {item.selectedSize}</span>}
                         {item.selectedColor && <span>Color: {item.selectedColor}</span>}
@@ -86,7 +86,7 @@ const CartPage = () => {
                       <div className="flex items-center border rounded">
                         <button 
                           onClick={() => handleQuantityChange(
-                            item.type === 'product' ? item.product.id : index.toString(), 
+                            item.type === 'product' ? item.product.id : item.service.id, 
                             item.quantity - 1
                           )}
                           className="px-2 py-1"
@@ -97,7 +97,7 @@ const CartPage = () => {
                           type="number"
                           value={item.quantity}
                           onChange={(e) => handleQuantityChange(
-                            item.type === 'product' ? item.product.id : index.toString(), 
+                            item.type === 'product' ? item.product.id : item.service.id, 
                             parseInt(e.target.value) || 1
                           )}
                           className="w-12 text-center p-0 border-none focus-visible:ring-0"
@@ -105,7 +105,7 @@ const CartPage = () => {
                         />
                         <button 
                           onClick={() => handleQuantityChange(
-                            item.type === 'product' ? item.product.id : index.toString(), 
+                            item.type === 'product' ? item.product.id : item.service.id, 
                             item.quantity + 1
                           )}
                           className="px-2 py-1"
@@ -114,7 +114,7 @@ const CartPage = () => {
                         </button>
                       </div>
                       <button 
-                        onClick={() => removeFromCart(item.type === 'product' ? item.product.id : index.toString())}
+                        onClick={() => removeFromCart(item.type === 'product' ? item.product.id : item.service.id)}
                         className="text-gray-400 hover:text-red-500"
                       >
                         <Trash2 size={18} />

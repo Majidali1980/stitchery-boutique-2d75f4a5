@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -17,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "@/components/ui/use-toast";
 import { useCart } from "@/context/CartContext";
@@ -46,7 +45,7 @@ const bottomMeasurementsSchema = z.object({
 const CustomStitchingPage = () => {
   const { addStitchingToCart } = useCart();
   const [selectedGarmentType, setSelectedGarmentType] = useState<"shirt" | "shalwar" | "pajama" | "complete-suit">("complete-suit");
-  const [selectedServiceType, setSelectedServiceType] = useState<ServiceType>("simple-stitching");
+  const [selectedServiceType, setSelectedServiceType] = useState<ServiceType>("standard");
   const [designImage, setDesignImage] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -159,18 +158,27 @@ const CustomStitchingPage = () => {
   };
 
   const onSubmit = (data: z.infer<typeof schema>) => {
-    // Process form data
+    // Process form data to create stitching order
+    const measurements = selectedGarmentType === "complete-suit" ? 
+      { ...data.shirtMeasurements as any, ...data.bottomMeasurements as any } :
+      { ...data.measurements as any };
+      
+    // Convert string measurements to numbers
+    const numericMeasurements: Record<string, number> = {};
+    Object.entries(measurements).forEach(([key, value]) => {
+      numericMeasurements[key] = parseFloat(value as string);
+    });
+    
+    // Create stitching order
     const stitchingOrder = {
       garmentType: selectedGarmentType,
-      serviceType: selectedServiceType,
-      measurements: selectedGarmentType === "complete-suit" ? {
-        ...data.shirtMeasurements,
-        ...data.bottomMeasurements
-      } : data.measurements,
+      serviceType: selectedServiceType as ServiceType,
+      measurements: numericMeasurements,
       fabric: data.fabric,
       designImage: designImage,
       notes: data.notes,
-      price: getServicePrice()
+      price: getServicePrice(),
+      estimatedDelivery: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString()
     };
 
     // Add to cart

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { 
@@ -71,7 +70,6 @@ const SizeChart = ({ type }: { type: string }) => {
               <td className="border px-4 py-2">{size}</td>
               {selectedMeasurements.map((m, j) => (
                 <td key={`${size}-${m.label}`} className="border px-4 py-2">
-                  {/* Generate reasonable measurement values */}
                   {m.label === "Length" ? 38 + (i * 2) : 
                    m.label === "Chest" ? 36 + (i * 2) : 
                    m.label === "Shoulder Width" ? 16 + (i * 0.5) : 
@@ -99,7 +97,6 @@ const ProductDetailPage = () => {
   
   const product = getProductById(id || "");
   
-  // If product not found, redirect to products page
   if (!product) {
     navigate("/products");
     return null;
@@ -153,12 +150,10 @@ const ProductDetailPage = () => {
     });
   };
   
-  // Get related products (same category)
   const relatedProducts = products
     .filter(p => p.category === product.category && p.id !== product.id)
     .slice(0, 4);
 
-  // Get similar type products (ready-to-wear or unstitched)
   const similarTypeProducts = products
     .filter(p => p.type === product.type && p.id !== product.id && p.category !== product.category)
     .slice(0, 4);
@@ -185,7 +180,6 @@ const ProductDetailPage = () => {
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-        {/* Product Images */}
         <div>
           <div className="relative overflow-hidden rounded-lg aspect-square">
             <img
@@ -217,28 +211,24 @@ const ProductDetailPage = () => {
             )}
           </div>
           
-          {/* Thumbnails */}
-          {product.images.length > 1 && (
-            <div className="flex space-x-2 mt-4">
-              {product.images.map((img, idx) => (
-                <div
-                  key={idx}
-                  className={`cursor-pointer border-2 rounded-md overflow-hidden w-20 h-20 ${
-                    currentImgIndex === idx ? 'border-brand-gold' : 'border-transparent'
-                  }`}
-                  onClick={() => setCurrentImgIndex(idx)}
-                >
-                  <img
-                    src={img}
-                    alt={`${product.name} view ${idx+1}`}
-                    className="object-cover w-full h-full"
-                  />
-                </div>
-              ))}
-            </div>
-          )}
+          <div className="flex space-x-2 mt-4">
+            {product.images.map((img, idx) => (
+              <div
+                key={idx}
+                className={`cursor-pointer border-2 rounded-md overflow-hidden w-20 h-20 ${
+                  currentImgIndex === idx ? 'border-brand-gold' : 'border-transparent'
+                }`}
+                onClick={() => setCurrentImgIndex(idx)}
+              >
+                <img
+                  src={img}
+                  alt={`${product.name} view ${idx+1}`}
+                  className="object-cover w-full h-full"
+                />
+              </div>
+            ))}
+          </div>
           
-          {/* Social Sharing */}
           <div className="mt-6">
             <p className="text-sm text-gray-500 mb-2">Share this product:</p>
             <div className="flex space-x-3">
@@ -278,7 +268,6 @@ const ProductDetailPage = () => {
           </div>
         </div>
         
-        {/* Product Details */}
         <div>
           <h1 className="text-3xl font-semibold mb-2">{product.name}</h1>
           
@@ -290,7 +279,6 @@ const ProductDetailPage = () => {
           
           <Separator className="my-6" />
           
-          {/* Product Type */}
           <div className="mb-6">
             <p className="text-sm text-gray-500 mb-2">Product Type</p>
             <span className="inline-block bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">
@@ -298,7 +286,6 @@ const ProductDetailPage = () => {
             </span>
           </div>
           
-          {/* Sizes */}
           {product.type === "ready-to-wear" && product.sizes && product.sizes.length > 0 && (
             <div className="mb-6">
               <p className="text-sm text-gray-500 mb-2">Size</p>
@@ -326,7 +313,6 @@ const ProductDetailPage = () => {
             </div>
           )}
           
-          {/* Quantity */}
           <div className="mb-6">
             <p className="text-sm text-gray-500 mb-2">Quantity</p>
             <div className="flex items-center space-x-3">
@@ -353,7 +339,6 @@ const ProductDetailPage = () => {
             </div>
           </div>
           
-          {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-3">
             <Button
               className="w-full sm:w-auto bg-brand-gold hover:bg-brand-gold/90 flex items-center"
@@ -390,7 +375,6 @@ const ProductDetailPage = () => {
           
           <Separator className="my-6" />
           
-          {/* Custom Stitching Info */}
           {product.type === "unstitched" && (
             <div className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-100">
               <h3 className="text-lg font-medium mb-2">Custom Stitching Available</h3>
@@ -404,7 +388,6 @@ const ProductDetailPage = () => {
             </div>
           )}
           
-          {/* Delivery Info */}
           <div className="flex items-start space-x-4 mt-6">
             <div className="flex flex-col items-center">
               <Check className="text-brand-gold" size={18} />
@@ -437,7 +420,6 @@ const ProductDetailPage = () => {
         </div>
       </div>
       
-      {/* Product Tabs */}
       <div className="mt-16">
         <Tabs defaultValue="description">
           <TabsList className="w-full justify-start border-b rounded-none">
@@ -495,7 +477,6 @@ const ProductDetailPage = () => {
         </Tabs>
       </div>
       
-      {/* Related Products */}
       {relatedProducts.length > 0 && (
         <div className="mt-16">
           <h2 className="text-2xl font-semibold mb-6">Related Products</h2>
@@ -503,7 +484,6 @@ const ProductDetailPage = () => {
         </div>
       )}
       
-      {/* Similar Type Products */}
       {similarTypeProducts.length > 0 && (
         <div className="mt-16">
           <h2 className="text-2xl font-semibold mb-6">

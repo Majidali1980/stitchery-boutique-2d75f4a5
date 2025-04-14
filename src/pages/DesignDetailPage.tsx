@@ -24,7 +24,7 @@ import { CustomDesign } from '@/types/stitching';
 // We'll fetch from our custom design data later, for now using mock data
 const getDesignById = (id: string): CustomDesign | undefined => {
   // This would be replaced with actual API call
-  const allDesigns = [
+  const allDesigns: CustomDesign[] = [
     // Suit designs
     {
       id: "suit-1",
