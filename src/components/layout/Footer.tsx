@@ -1,7 +1,6 @@
-
 import { Link } from "react-router-dom";
 import { 
-  Mail, Phone, MapPin, Facebook, Instagram, Whatsapp
+  Mail, Phone, MapPin, Facebook, Instagram, MessageCircle
 } from "lucide-react";
 
 const Footer = () => {
@@ -110,7 +109,7 @@ const Footer = () => {
                 </span>
               </li>
               <li className="flex items-center space-x-2">
-                <Whatsapp size={18} className="text-brand-gold" />
+                <MessageCircle size={18} className="text-brand-gold" />
                 <span className="text-sm text-gray-300">
                   03343233883
                 </span>
