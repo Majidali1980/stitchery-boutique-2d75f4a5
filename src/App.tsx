@@ -29,6 +29,7 @@ import NotFound from "@/pages/NotFound";
 import CustomStitchingPage from "@/pages/CustomStitchingPage";
 import SizeChartPage from "@/pages/SizeChartPage";
 import UnstitchedSuitsPage from "@/pages/UnstitchedSuitsPage";
+import DesignDetailPage from "@/pages/DesignDetailPage";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +47,7 @@ const App = () => (
             <Route path="products/:id" element={<ProductDetailPage />} />
             <Route path="cart" element={<CartPage />} />
             <Route path="custom-stitching" element={<CustomStitchingPage />} />
+            <Route path="custom-stitching/design/:id" element={<DesignDetailPage />} />
             <Route path="size-chart" element={<SizeChartPage />} />
             <Route path="unstitched-suits" element={<UnstitchedSuitsPage />} />
             <Route path="about" element={<AboutPage />} />

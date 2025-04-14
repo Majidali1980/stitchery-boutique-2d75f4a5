@@ -5,6 +5,7 @@ import ProductGrid from "@/components/products/ProductGrid";
 import Services from "@/components/home/Services";
 import PromoBanner from "@/components/home/PromoBanner";
 import TestimonialSection from "@/components/home/TestimonialSection";
+import CustomDesigns from "@/components/custom-stitching/CustomDesigns";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { getFeaturedProducts } from "@/data/products";
@@ -23,11 +24,13 @@ const HomePage = () => {
           title="Featured Products"
         />
         <div className="text-center mt-8">
-          <Button asChild size="lg" className="bg-brand-gold hover:bg-brand-gold/90">
+          <Button asChild size="lg" className="bg-brand-gold hover:bg-brand-gold/90 text-white">
             <Link to="/products">View All Products</Link>
           </Button>
         </div>
       </div>
+      
+      <CustomDesigns />
       
       <PromoBanner />
       <Services />

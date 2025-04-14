@@ -1,165 +1,75 @@
 
-import { createContext, useContext, useState, ReactNode, useMemo } from 'react';
-import { Product } from '@/types';
+import React, { createContext, useContext, useState, ReactNode } from "react";
+import { Product } from "@/types";
 
-// Define the CartItem type
-interface ProductCartItem {
-  type: 'product';
-  product: Product;
-  quantity: number;
-  selectedSize?: string;
-  selectedColor?: string;
-}
-
-// Extend the CartItem type to include stitching orders
-interface StitchingCartItem {
-  type: 'stitching';
-  service: {
-    garmentType: string;
-    serviceType: string;
-    measurements: Record<string, number>;
-    fabric?: string;
-    designImage?: string | null;
-    notes?: string;
-    price: number;
-  };
+interface CartItem extends Product {
   quantity: number;
 }
 
-// Update CartItem type to be a union type
-type CartItem = ProductCartItem | StitchingCartItem;
-
-interface CartContextProps {
+export interface CartContextProps {
   items: CartItem[];
-  addToCart: (product: Product, quantity: number, size?: string, color?: string) => void;
-  addStitchingToCart: (stitchingService: StitchingCartItem['service']) => void;
-  removeFromCart: (itemId: string) => void;
+  addItem: (item: Product) => void;
+  removeItem: (itemId: string) => void;
   updateQuantity: (itemId: string, quantity: number) => void;
   clearCart: () => void;
-  totalPrice: number;
-  totalItems: number;
+  subtotal: number;
 }
 
-export const CartContext = createContext<CartContextProps>({
-  items: [],
-  addToCart: () => {},
-  addStitchingToCart: () => {},
-  removeFromCart: () => {},
-  updateQuantity: () => {},
-  clearCart: () => {},
-  totalPrice: 0,
-  totalItems: 0,
-});
+const CartContext = createContext<CartContextProps | undefined>(undefined);
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [items, setItems] = useState<CartItem[]>([]);
-  
-  // Calculate total price
-  const totalPrice = useMemo(() => {
-    return items.reduce((total, item) => {
-      if (item.type === 'product') {
-        return total + (item.product.price * item.quantity);
+
+  const addItem = (product: Product) => {
+    setItems((prevItems) => {
+      const existingItem = prevItems.find((item) => item.id === product.id);
+      if (existingItem) {
+        return prevItems.map((item) =>
+          item.id === product.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        );
       } else {
-        return total + (item.service.price * item.quantity);
-      }
-    }, 0);
-  }, [items]);
-  
-  // Calculate total items
-  const totalItems = useMemo(() => {
-    return items.reduce((total, item) => total + item.quantity, 0);
-  }, [items]);
-  
-  // Add product to cart
-  const addToCart = (product: Product, quantity: number, size?: string, color?: string) => {
-    setItems(prevItems => {
-      // Check if product already in cart with same size and color
-      const existingItemIndex = prevItems.findIndex(
-        item => item.type === 'product' && item.product.id === product.id && item.selectedSize === size && item.selectedColor === color
-      );
-      
-      if (existingItemIndex >= 0) {
-        // Update quantity of existing item
-        const newItems = [...prevItems];
-        newItems[existingItemIndex].quantity += quantity;
-        return newItems;
-      } else {
-        // Add new item
-        return [...prevItems, { 
-          type: 'product',
-          product, 
-          quantity,
-          selectedSize: size,
-          selectedColor: color
-        }];
+        return [...prevItems, { ...product, quantity: 1 }];
       }
     });
   };
 
-  // Add stitching service to cart
-  const addStitchingToCart = (stitchingService: StitchingCartItem['service']) => {
-    setItems(prevItems => {
-      return [...prevItems, {
-        type: 'stitching',
-        service: stitchingService,
-        quantity: 1
-      }];
-    });
+  const removeItem = (itemId: string) => {
+    setItems((prevItems) => prevItems.filter((item) => item.id !== itemId));
   };
-  
-  // Remove item from cart
-  const removeFromCart = (itemId: string) => {
-    setItems(prevItems => {
-      if (prevItems[0]?.type === 'product') {
-        return prevItems.filter(item => 
-          item.type === 'product' && item.product.id !== itemId
-        );
-      } else {
-        // For stitching items, we'll use the index as the ID since they don't have a unique id
-        const index = parseInt(itemId);
-        return prevItems.filter((_, idx) => idx !== index);
-      }
-    });
-  };
-  
-  // Update quantity of an item
+
   const updateQuantity = (itemId: string, quantity: number) => {
-    if (quantity <= 0) {
-      removeFromCart(itemId);
-      return;
-    }
-    
-    setItems(prevItems => {
-      return prevItems.map(item => {
-        if (item.type === 'product' && item.product.id === itemId) {
-          return { ...item, quantity };
-        } else if (item.type === 'stitching' && itemId === prevItems.indexOf(item).toString()) {
-          return { ...item, quantity };
-        }
-        return item;
-      });
-    });
+    if (quantity < 1) return;
+    setItems((prevItems) =>
+      prevItems.map((item) =>
+        item.id === itemId ? { ...item, quantity } : item
+      )
+    );
   };
-  
-  // Clear cart
+
   const clearCart = () => {
     setItems([]);
   };
-  
+
+  const subtotal = items.reduce(
+    (total, item) => total + item.price * item.quantity,
+    0
+  );
+
   return (
-    <CartContext.Provider value={{
-      items,
-      addToCart,
-      addStitchingToCart,
-      removeFromCart,
-      updateQuantity,
-      clearCart,
-      totalPrice,
-      totalItems,
-    }}>
+    <CartContext.Provider
+      value={{ items, addItem, removeItem, updateQuantity, clearCart, subtotal }}
+    >
       {children}
     </CartContext.Provider>
   );
 };
 
-export const useCart = () => useContext(CartContext);
+export const useCart = () => {
+  const context = useContext(CartContext);
+  if (context === undefined) {
+    throw new Error("useCart must be used within a CartProvider");
+  }
+  return context;
+};

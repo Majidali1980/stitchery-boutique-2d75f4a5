@@ -2,24 +2,32 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { 
-  Heart, ShoppingCart, Menu, X, Search 
+  Heart, ShoppingCart, Menu, X, Search, Sun, Moon
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
+import Marquee from "./Marquee";
+import { useTheme } from "@/context/ThemeContext";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { items: cartItems } = useCart();
   const { items: wishlistItems } = useWishlist();
+  const { theme, setTheme } = useTheme();
+  
+  const toggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+  };
   
   return (
-    <header className="border-b">
+    <header className="border-b dark:border-gray-700">
       <div className="bg-brand-gold text-white py-2">
-        <div className="container text-center text-sm">
-          Free shipping on orders over $100 | Custom stitching available
-        </div>
+        <Marquee 
+          text="Free shipping on orders over Rs.15000 | Custom stitching available" 
+          speed="normal"
+        />
       </div>
       
       <div className="container py-4">
@@ -59,6 +67,9 @@ const Header = () => {
             <Link to="/size-chart" className="text-sm font-medium hover:text-brand-gold transition-colors">
               Size Chart
             </Link>
+            <Link to="/unstitched-suits" className="text-sm font-medium hover:text-brand-gold transition-colors">
+              Unstitched Suits
+            </Link>
             <Link to="/about" className="text-sm font-medium hover:text-brand-gold transition-colors">
               About
             </Link>
@@ -76,6 +87,14 @@ const Header = () => {
               />
               <Search className="absolute right-2 top-2 h-5 w-5 text-muted-foreground" />
             </div>
+            
+            <button onClick={toggleTheme} className="p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800">
+              {theme === 'dark' ? (
+                <Sun className="h-5 w-5" />
+              ) : (
+                <Moon className="h-5 w-5" />
+              )}
+            </button>
             
             <Link to="/wishlist" className="relative">
               <Heart className="h-6 w-6" />
@@ -99,7 +118,7 @@ const Header = () => {
               <Button variant="outline" size="sm">Login</Button>
             </Link>
             <Link to="/signup">
-              <Button size="sm">Sign Up</Button>
+              <Button size="sm" className="bg-brand-gold hover:bg-brand-gold/90 text-white">Sign Up</Button>
             </Link>
           </div>
         </div>
@@ -107,7 +126,7 @@ const Header = () => {
       
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="md:hidden container py-4 bg-background border-t">
+        <div className="md:hidden container py-4 bg-background border-t dark:border-gray-700">
           <div className="flex flex-col space-y-4">
             <Link 
               to="/" 
@@ -136,6 +155,13 @@ const Header = () => {
               onClick={() => setIsMenuOpen(false)}
             >
               Size Chart
+            </Link>
+            <Link 
+              to="/unstitched-suits" 
+              className="text-lg font-medium hover:text-brand-gold"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Unstitched Suits
             </Link>
             <Link 
               to="/about" 
