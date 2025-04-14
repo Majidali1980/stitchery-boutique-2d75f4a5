@@ -1,7 +1,7 @@
 
 import { Link } from "react-router-dom";
 import { 
-  Mail, Phone, MapPin, Facebook, Instagram, Twitter 
+  Mail, Phone, MapPin, Facebook, Instagram, Whatsapp
 } from "lucide-react";
 
 const Footer = () => {
@@ -20,14 +20,21 @@ const Footer = () => {
               Expert in all types of stitching for ladies' and girls' suits. Custom stitching and ready-to-wear options available.
             </p>
             <div className="flex space-x-4 mt-4">
-              <a href="#" className="text-gray-300 hover:text-brand-gold">
+              <a 
+                href="https://www.facebook.com/profile.php?id=100067160730050" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-gray-300 hover:text-brand-gold"
+              >
                 <Facebook size={20} />
               </a>
-              <a href="#" className="text-gray-300 hover:text-brand-gold">
+              <a 
+                href="https://www.instagram.com/mafabrics2024?igsh=a2hoM2VoMnZ1NGt6" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-gray-300 hover:text-brand-gold"
+              >
                 <Instagram size={20} />
-              </a>
-              <a href="#" className="text-gray-300 hover:text-brand-gold">
-                <Twitter size={20} />
               </a>
             </div>
           </div>
@@ -99,7 +106,13 @@ const Footer = () => {
               <li className="flex items-center space-x-2">
                 <Phone size={18} className="text-brand-gold" />
                 <span className="text-sm text-gray-300">
-                  03070125273
+                  03070125274
+                </span>
+              </li>
+              <li className="flex items-center space-x-2">
+                <Whatsapp size={18} className="text-brand-gold" />
+                <span className="text-sm text-gray-300">
+                  03343233883
                 </span>
               </li>
               <li className="flex items-center space-x-2">
