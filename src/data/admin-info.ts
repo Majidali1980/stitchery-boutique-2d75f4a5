@@ -1,8 +1,8 @@
 
 // Admin login information
 export const adminLoginInfo = {
-  email: "alimajid03021980@gmail.com",
-  password: "saleemgreat1980",
+  email: "admin@matailor.com",
+  password: "MA_Tailor@2024",
   role: "admin"
 };
 
