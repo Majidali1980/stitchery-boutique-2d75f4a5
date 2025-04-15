@@ -1,30 +1,31 @@
+
 import { useState, useEffect } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { ThemeProvider } from "@/components/theme-provider"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
-import { HomePage } from "@/pages/HomePage"
-import { ProductsPage } from "@/pages/ProductsPage";
-import { ProductDetailPage } from "@/pages/ProductDetailPage";
-import { CartPage } from "@/pages/CartPage";
-import { CheckoutPage } from "@/pages/CheckoutPage";
-import { ContactPage } from "@/pages/ContactPage";
-import { AboutPage } from "@/pages/AboutPage";
-import { NotFoundPage } from "@/pages/NotFoundPage";
+import HomePage from "@/pages/HomePage"
+import ProductsPage from "@/pages/ProductsPage";
+import ProductDetailPage from "@/pages/ProductDetailPage";
+import CartPage from "@/pages/CartPage";
+import CheckoutPage from "@/pages/CheckoutPage";
+import ContactPage from "@/pages/ContactPage";
+import AboutPage from "@/pages/AboutPage";
+import NotFoundPage from "@/pages/NotFoundPage";
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import { Toaster } from "@/components/ui/toaster"
 import { CartProvider } from "@/context/CartContext";
-import { CustomStitchingPage } from "@/pages/CustomStitchingPage";
-import { StitchingDesignsPage } from "@/pages/StitchingDesignsPage";
-import { DesignDetailPage } from "@/pages/DesignDetailPage";
-import { SizeChartPage } from "@/pages/SizeChartPage";
-import { AdminDashboardPage } from "@/pages/admin/AdminDashboardPage";
-import { AdminOrdersPage } from "@/pages/admin/AdminOrdersPage";
-import { AdminProductsPage } from "@/pages/admin/AdminProductsPage";
-import { AdminStitchingOrdersPage } from "@/pages/admin/AdminStitchingOrdersPage";
-import { AdminLayout } from "@/layouts/AdminLayout";
-import { AdminLoginPage } from "@/pages/admin/AdminLoginPage";
+import CustomStitchingPage from "@/pages/CustomStitchingPage";
+import StitchingDesignsPage from "@/pages/StitchingDesignsPage";
+import DesignDetailPage from "@/pages/DesignDetailPage";
+import SizeChartPage from "@/pages/SizeChartPage";
+import AdminDashboardPage from "@/pages/admin/AdminDashboardPage";
+import AdminOrdersPage from "@/pages/admin/AdminOrdersPage";
+import AdminProductsPage from "@/pages/admin/AdminProductsPage";
+import AdminStitchingOrdersPage from "@/pages/admin/AdminStitchingOrdersPage";
+import AdminLayout from "@/layouts/AdminLayout";
+import AdminLoginPage from "@/pages/admin/AdminLoginPage";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY!);
 
