@@ -31,7 +31,6 @@ const StitchingDesignsPage = () => {
             {design.description && (
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">{design.description}</p>
             )}
-            <p className="text-brand-gold font-semibold mt-2">Rs. {design.price.toLocaleString()}</p>
           </CardContent>
           <CardFooter className="p-4 pt-0">
             <Button 
@@ -49,7 +48,7 @@ const StitchingDesignsPage = () => {
   );
 
   return (
-    <div className="container py-16">
+    <div className="container py-16 max-w-7xl mx-auto">
       <h1 className="text-4xl font-bold text-center mb-2">Stitching Designs</h1>
       <p className="text-gray-600 dark:text-gray-300 text-center mb-8 max-w-2xl mx-auto">
         Browse our exclusive collection of stitching designs for different garment types

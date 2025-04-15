@@ -6,10 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { suitDesigns, shirtDesigns, trouserDesigns, kameezShalwarDesigns } from "@/data/stitching-designs";
-import { Check, Ruler, Shirt } from "lucide-react";
-import { useCart } from "@/context/CartContext";
-import { toast } from "@/components/ui/use-toast";
+import { Check, Ruler, Shirt, Star } from "lucide-react";
 import { useAuth } from "@clerk/clerk-react";
+import { toast } from "@/components/ui/use-toast";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 
 const DesignDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -17,7 +18,8 @@ const DesignDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { isSignedIn } = useAuth();
-  const { addStitchingService } = useCart();
+  const [userReview, setUserReview] = useState({ name: "", comment: "", rating: 5 });
+  const [reviews, setReviews] = useState<Array<{name: string; comment: string; rating: number; date: string}>>([]);
 
   useEffect(() => {
     // Find design across all design types
@@ -28,27 +30,11 @@ const DesignDetailPage = () => {
     setLoading(false);
   }, [id]);
 
-  const handleAddToCart = () => {
-    if (!design) return;
-    
-    addStitchingService({
-      garmentType: design.type,
-      design: design,
-      price: design.price,
-      details: `${design.name} (${design.designCode || design.id})`,
-    }, 1);
-    
-    toast({
-      title: "Added to cart",
-      description: `${design.name} has been added to your cart.`,
-    });
-  };
-
-  const handleBuyNow = () => {
+  const handleCustomStitching = () => {
     if (!isSignedIn) {
       toast({
         title: "Authentication required",
-        description: "Please sign in to proceed with checkout.",
+        description: "Please sign in to proceed with custom stitching.",
         variant: "destructive",
       });
       return;
@@ -56,14 +42,42 @@ const DesignDetailPage = () => {
     
     if (!design) return;
     
-    addStitchingService({
-      garmentType: design.type,
-      design: design,
-      price: design.price,
-      details: `${design.name} (${design.designCode || design.id})`,
-    }, 1);
+    // Store selected design in sessionStorage to retrieve it on the custom stitching page
+    sessionStorage.setItem('selectedDesign', JSON.stringify({
+      id: design.id,
+      name: design.name,
+      type: design.type,
+      imageUrl: design.imageUrl,
+      designCode: design.designCode || design.id
+    }));
     
-    navigate("/checkout");
+    // Navigate to custom stitching page
+    navigate("/custom-stitching");
+  };
+
+  const handleSubmitReview = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!userReview.name.trim() || !userReview.comment.trim()) {
+      toast({
+        title: "Review submission failed",
+        description: "Please provide your name and comment",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const newReview = {
+      ...userReview,
+      date: new Date().toISOString()
+    };
+
+    setReviews(prev => [newReview, ...prev]);
+    setUserReview({ name: "", comment: "", rating: 5 });
+
+    toast({
+      title: "Review submitted",
+      description: "Thank you for your feedback!"
+    });
   };
 
   if (loading) {
@@ -89,7 +103,7 @@ const DesignDetailPage = () => {
   }
 
   return (
-    <div className="container py-16">
+    <div className="container py-16 max-w-7xl mx-auto">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
         {/* Design Image */}
         <div>
@@ -97,7 +111,7 @@ const DesignDetailPage = () => {
             <img 
               src={design.imageUrl}
               alt={design.name}
-              className="object-contain w-full h-full rounded"
+              className="object-contain w-full h-full max-h-[500px] rounded"
             />
           </div>
         </div>
@@ -123,10 +137,7 @@ const DesignDetailPage = () => {
           <h1 className="text-3xl font-bold mt-2">{design.name}</h1>
 
           <div className="mt-4 flex items-center">
-            <span className="text-2xl font-semibold text-brand-gold">
-              Rs. {design.price.toLocaleString()}
-            </span>
-            <Badge variant="outline" className="ml-4">
+            <Badge variant="outline" className="ml-0">
               Code: {design.designCode || design.id}
             </Badge>
           </div>
@@ -170,20 +181,12 @@ const DesignDetailPage = () => {
             </ul>
           </div>
 
-          <div className="flex items-center space-x-4 mt-8">
-            <Button 
-              onClick={handleAddToCart}
-              className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-white"
-            >
-              Add to Cart
-            </Button>
-            <Button 
-              onClick={handleBuyNow}
-              className="flex-1 bg-brand-gold hover:bg-brand-gold/90 text-white"
-            >
-              Buy Now
-            </Button>
-          </div>
+          <Button 
+            onClick={handleCustomStitching}
+            className="w-full mt-8 bg-brand-gold hover:bg-brand-gold/90 text-white"
+          >
+            Get This Design Custom Stitched
+          </Button>
 
           <div className="mt-6 flex items-center space-x-4">
             <Link 
@@ -201,6 +204,92 @@ const DesignDetailPage = () => {
               <span>Custom Measurements</span>
             </Link>
           </div>
+        </div>
+      </div>
+
+      {/* Review Section */}
+      <div className="mt-16">
+        <h2 className="text-2xl font-semibold mb-6">Customer Reviews</h2>
+        
+        {/* Submit Review Form */}
+        <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg mb-8">
+          <h3 className="text-lg font-medium mb-4">Write a Review</h3>
+          <form onSubmit={handleSubmitReview}>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div>
+                <label htmlFor="name" className="block text-sm font-medium mb-1">Your Name</label>
+                <Input 
+                  id="name" 
+                  value={userReview.name}
+                  onChange={(e) => setUserReview({...userReview, name: e.target.value})}
+                  placeholder="Enter your name"
+                  className="w-full"
+                />
+              </div>
+              <div>
+                <label htmlFor="rating" className="block text-sm font-medium mb-1">Rating</label>
+                <div className="flex items-center">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setUserReview({...userReview, rating: star})}
+                      className="focus:outline-none"
+                    >
+                      <Star 
+                        className={`h-6 w-6 ${star <= userReview.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} 
+                      />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="mt-4">
+              <label htmlFor="comment" className="block text-sm font-medium mb-1">Your Review</label>
+              <Textarea 
+                id="comment" 
+                value={userReview.comment}
+                onChange={(e) => setUserReview({...userReview, comment: e.target.value})}
+                placeholder="Share your thoughts about this design"
+                className="w-full"
+                rows={4}
+              />
+            </div>
+            <Button type="submit" className="mt-4 bg-brand-gold hover:bg-brand-gold/90 text-white">
+              Submit Review
+            </Button>
+          </form>
+        </div>
+
+        {/* Display Reviews */}
+        <div className="space-y-6">
+          {reviews.length > 0 ? (
+            reviews.map((review, index) => (
+              <div key={index} className="border-b pb-6 last:border-0">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-medium">{review.name}</h4>
+                    <div className="flex items-center mt-1">
+                      {[...Array(5)].map((_, i) => (
+                        <Star 
+                          key={i}
+                          className={`h-4 w-4 ${i < review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} 
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  <span className="text-sm text-gray-500">
+                    {new Date(review.date).toLocaleDateString()}
+                  </span>
+                </div>
+                <p className="mt-3 text-gray-600 dark:text-gray-300">{review.comment}</p>
+              </div>
+            ))
+          ) : (
+            <div className="text-center py-8 text-gray-500">
+              No reviews yet. Be the first to review this design!
+            </div>
+          )}
         </div>
       </div>
     </div>
