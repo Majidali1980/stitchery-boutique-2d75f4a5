@@ -53,7 +53,7 @@ export interface Review {
 export interface CustomDesign {
   id: string;
   name: string;
-  type: "shirt" | "suit" | "shalwar" | "pajama";
+  type: "shirt" | "suit" | "shalwar" | "pajama" | "trouser" | "kameez";
   category?: string; // Added category field
   imageUrl: string;
   description?: string;

@@ -1,7 +1,7 @@
 
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import { Product } from "@/types";
-import { CustomStitchingOrder, CartItemType, ProductCartItem, StitchingCartItem } from "@/types/stitching";
+import { CustomStitchingOrder, CartItemType, ProductCartItem, StitchingCartItem, CustomDesign } from "@/types/stitching";
 
 export interface CartContextProps {
   items: CartItemType[];
@@ -12,6 +12,7 @@ export interface CartContextProps {
   subtotal: number;
   addToCart: (product: Product, quantity: number, selectedSize?: string, selectedColor?: string) => void;
   addStitchingToCart: (stitchingOrder: Omit<CustomStitchingOrder, 'id' | 'customerId' | 'customerName' | 'customerPhone' | 'customerEmail' | 'status' | 'createdAt'>) => void;
+  addStitchingService: (designInfo: { garmentType: string; design: CustomDesign; price: number; details: string }, quantity: number) => void;
   removeFromCart: (itemId: string) => void;
   totalPrice: number;
 }
@@ -93,6 +94,30 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     setItems(prevItems => [...prevItems, newStitchingItem]);
   };
 
+  // Add the new method for stitching design services
+  const addStitchingService = (designInfo: { garmentType: string; design: CustomDesign; price: number; details: string }, quantity: number) => {
+    const serviceId = `design-${designInfo.design.id}-${Date.now()}`;
+    
+    const stitchingItem: StitchingCartItem = {
+      type: 'stitching',
+      service: {
+        id: serviceId,
+        garmentType: designInfo.garmentType as "shirt" | "shalwar" | "pajama" | "complete-suit",
+        serviceType: "custom",
+        price: designInfo.price,
+        measurements: {},
+        estimatedDelivery: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(), // 14 days from now
+        status: 'pending',
+        createdAt: new Date().toISOString(),
+        designId: designInfo.design.id,
+        notes: designInfo.details
+      },
+      quantity: quantity
+    };
+    
+    setItems(prevItems => [...prevItems, stitchingItem]);
+  };
+
   const removeItem = (itemId: string) => {
     setItems((prevItems) => prevItems.filter(item => 
       (item.type === 'product' && item.product.id !== itemId) || 
@@ -144,6 +169,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         subtotal,
         addToCart,
         addStitchingToCart,
+        addStitchingService,
         removeFromCart,
         totalPrice
       }}
