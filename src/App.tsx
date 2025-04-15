@@ -12,10 +12,12 @@ import CheckoutPage from "@/pages/CheckoutPage";
 import ContactPage from "@/pages/ContactPage";
 import AboutPage from "@/pages/AboutPage";
 import NotFoundPage from "@/pages/NotFoundPage";
+import WishlistPage from "@/pages/WishlistPage";
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import { Toaster } from "@/components/ui/toaster"
 import { CartProvider } from "@/context/CartContext";
+import { WishlistProvider } from "@/context/WishlistContext";
 import CustomStitchingPage from "@/pages/CustomStitchingPage";
 import StitchingDesignsPage from "@/pages/StitchingDesignsPage";
 import DesignDetailPage from "@/pages/DesignDetailPage";
@@ -47,42 +49,45 @@ function App() {
       disableTransitionOnChange
     >
       <CartProvider>
-        <div className="flex flex-col min-h-screen">
-          <SiteHeader />
-          <main className="flex-grow">
-            <Elements stripe={stripePromise}>
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/products" element={<ProductsPage />} />
-                <Route path="/products/:productId" element={<ProductDetailPage />} />
-                <Route path="/cart" element={<CartPage />} />
-                <Route path="/checkout" element={<CheckoutPage />} />
-                <Route path="/contact" element={<ContactPage />} />
-                <Route path="/about" element={<AboutPage />} />
-                <Route path="/custom-stitching" element={<CustomStitchingPage />} />
-                <Route path="/stitching-designs" element={<StitchingDesignsPage />} />
-                <Route path="/custom-stitching/design/:id" element={<DesignDetailPage />} />
-                <Route path="/size-chart" element={<SizeChartPage />} />
-                
-                {/* Admin Routes */}
-                <Route path="/admin-login" element={<AdminLoginPage />} />
-                <Route path="/admin" element={<AdminLayout />}>
-                  <Route index element={<AdminDashboardPage />} />
-                  <Route path="orders" element={<AdminOrdersPage />} />
-                  <Route path="orders/pending" element={<AdminStitchingOrdersPage />} />
-                  <Route path="orders/completed" element={<AdminStitchingOrdersPage />} />
-                  <Route path="products" element={<AdminProductsPage />} />
-                  <Route path="customers" element={<div>Customers Management</div>} />
-                  <Route path="settings" element={<div>Admin Settings</div>} />
-                </Route>
+        <WishlistProvider>
+          <div className="flex flex-col min-h-screen">
+            <SiteHeader />
+            <main className="flex-grow">
+              <Elements stripe={stripePromise}>
+                <Routes>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/products" element={<ProductsPage />} />
+                  <Route path="/products/:productId" element={<ProductDetailPage />} />
+                  <Route path="/cart" element={<CartPage />} />
+                  <Route path="/wishlist" element={<WishlistPage />} />
+                  <Route path="/checkout" element={<CheckoutPage />} />
+                  <Route path="/contact" element={<ContactPage />} />
+                  <Route path="/about" element={<AboutPage />} />
+                  <Route path="/custom-stitching" element={<CustomStitchingPage />} />
+                  <Route path="/stitching-designs" element={<StitchingDesignsPage />} />
+                  <Route path="/custom-stitching/design/:id" element={<DesignDetailPage />} />
+                  <Route path="/size-chart" element={<SizeChartPage />} />
+                  
+                  {/* Admin Routes */}
+                  <Route path="/admin-login" element={<AdminLoginPage />} />
+                  <Route path="/admin" element={<AdminLayout />}>
+                    <Route index element={<AdminDashboardPage />} />
+                    <Route path="orders" element={<AdminOrdersPage />} />
+                    <Route path="orders/pending" element={<AdminStitchingOrdersPage />} />
+                    <Route path="orders/completed" element={<AdminStitchingOrdersPage />} />
+                    <Route path="products" element={<AdminProductsPage />} />
+                    <Route path="customers" element={<div>Customers Management</div>} />
+                    <Route path="settings" element={<div>Admin Settings</div>} />
+                  </Route>
 
-                <Route path="*" element={<NotFoundPage />} />
-              </Routes>
-            </Elements>
-          </main>
-          {isFooterVisible && <SiteFooter />}
-          <Toaster />
-        </div>
+                  <Route path="*" element={<NotFoundPage />} />
+                </Routes>
+              </Elements>
+            </main>
+            {isFooterVisible && <SiteFooter />}
+            <Toaster />
+          </div>
+        </WishlistProvider>
       </CartProvider>
     </ThemeProvider>
   );
