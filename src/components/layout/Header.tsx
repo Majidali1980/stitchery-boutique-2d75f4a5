@@ -6,16 +6,16 @@ import { Button } from "@/components/ui/button";
 import { useTheme } from "@/context/ThemeContext";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
-import { useMobileScreen } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/hooks/use-mobile";
 import AuthButtons from "@/components/auth/AuthButtons";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const { theme, setTheme } = useTheme();
-  const { cart } = useCart();
-  const { wishlist } = useWishlist();
-  const isMobile = useMobileScreen();
+  const { items: cartItems } = useCart();
+  const { items: wishlistItems } = useWishlist();
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -92,9 +92,9 @@ const Header = () => {
           {/* Wishlist */}
           <Link to="/wishlist" className="relative p-2">
             <Heart className="h-5 w-5" />
-            {wishlist.length > 0 && (
+            {wishlistItems.length > 0 && (
               <span className="absolute top-0 right-0 bg-brand-gold text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                {wishlist.length}
+                {wishlistItems.length}
               </span>
             )}
           </Link>
@@ -102,9 +102,9 @@ const Header = () => {
           {/* Cart */}
           <Link to="/cart" className="relative p-2">
             <ShoppingBag className="h-5 w-5" />
-            {cart.length > 0 && (
+            {cartItems.length > 0 && (
               <span className="absolute top-0 right-0 bg-brand-gold text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                {cart.length}
+                {cartItems.length}
               </span>
             )}
           </Link>
