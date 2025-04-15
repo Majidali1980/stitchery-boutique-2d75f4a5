@@ -19,6 +19,7 @@ import CartPage from "@/pages/CartPage";
 import WishlistPage from "@/pages/WishlistPage";
 import CheckoutPage from "@/pages/CheckoutPage";
 import CustomStitchingPage from "@/pages/CustomStitchingPage";
+import StitchingDesignsPage from "@/pages/StitchingDesignsPage";
 import DesignDetailPage from "@/pages/DesignDetailPage";
 import DesignCategoryPage from "@/pages/DesignCategoryPage";
 import OrderConfirmationPage from "@/pages/OrderConfirmationPage";
@@ -50,6 +51,7 @@ function App() {
               <Route path="checkout" element={<AuthProtected><CheckoutPage /></AuthProtected>} />
               <Route path="order-confirmation" element={<AuthProtected><OrderConfirmationPage /></AuthProtected>} />
               <Route path="custom-stitching" element={<CustomStitchingPage />} />
+              <Route path="stitching-designs" element={<StitchingDesignsPage />} />
               <Route path="custom-stitching/design/:id" element={<DesignDetailPage />} />
               <Route path="custom-stitching/category/:category" element={<DesignCategoryPage />} />
               <Route path="custom-stitching/:type-designs" element={<DesignCategoryPage />} />

@@ -26,7 +26,7 @@ const CheckoutPage = () => {
   });
   
   const subtotal = totalPrice;
-  const shippingCost = subtotal > 3000 ? 0 : 300;
+  const shippingCost = subtotal > 3000 ? 0 : 300; // Free shipping over Rs. 3000, otherwise Rs. 300
   const finalTotal = subtotal + shippingCost;
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -79,7 +79,7 @@ const CheckoutPage = () => {
         <div className="lg:w-2/3">
           <form onSubmit={handleSubmit}>
             {/* Contact Information */}
-            <div className="bg-white rounded-lg border p-6 mb-6">
+            <div className="bg-white dark:bg-gray-900 rounded-lg border dark:border-gray-700 p-6 mb-6">
               <h2 className="text-xl font-semibold mb-4">Contact Information</h2>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
@@ -132,7 +132,7 @@ const CheckoutPage = () => {
             </div>
             
             {/* Shipping Address */}
-            <div className="bg-white rounded-lg border p-6 mb-6">
+            <div className="bg-white dark:bg-gray-900 rounded-lg border dark:border-gray-700 p-6 mb-6">
               <h2 className="text-xl font-semibold mb-4">Shipping Address</h2>
               
               <div className="mb-4">
@@ -194,7 +194,7 @@ const CheckoutPage = () => {
             </div>
             
             {/* Payment Method */}
-            <div className="bg-white rounded-lg border p-6 mb-6">
+            <div className="bg-white dark:bg-gray-900 rounded-lg border dark:border-gray-700 p-6 mb-6">
               <h2 className="text-xl font-semibold mb-4">Payment Method</h2>
               
               <RadioGroup
@@ -218,25 +218,25 @@ const CheckoutPage = () => {
               </RadioGroup>
               
               {formData.paymentMethod === "card" && (
-                <div className="mt-4 p-4 bg-gray-50 rounded-md">
-                  <p className="text-sm text-gray-500 mb-2">
+                <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-md">
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
                     Credit/Debit card payment will be processed on the next step.
                   </p>
                 </div>
               )}
               
               {formData.paymentMethod === "bank" && (
-                <div className="mt-4 p-4 bg-gray-50 rounded-md">
+                <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-md">
                   <p className="text-sm font-medium mb-1">Bank Transfer Details:</p>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
                     Account Title: MA Tailor<br />
                     Account Number: 12345678901<br />
                     Bank: Sample Bank<br />
                     IBAN: PK00SAMP0000012345678901
                   </p>
-                  <p className="text-sm text-gray-500 mt-2">
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
                     Please make the payment within 24 hours and send the receipt to
-                    orders@matailor.com
+                    our WhatsApp number.
                   </p>
                 </div>
               )}
@@ -254,7 +254,7 @@ const CheckoutPage = () => {
         
         {/* Order Summary */}
         <div className="lg:w-1/3">
-          <div className="bg-white rounded-lg border p-6 sticky top-24">
+          <div className="bg-white dark:bg-gray-900 rounded-lg border dark:border-gray-700 p-6 sticky top-24">
             <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
             
             <div className="space-y-4 mb-6">
@@ -294,16 +294,22 @@ const CheckoutPage = () => {
             
             <div className="border-t pt-4 space-y-3">
               <div className="flex justify-between">
-                <span className="text-gray-600">Subtotal</span>
+                <span className="text-gray-600 dark:text-gray-400">Subtotal</span>
                 <span>Rs. {subtotal.toLocaleString()}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Shipping</span>
+                <span className="text-gray-600 dark:text-gray-400">Shipping</span>
                 <span>{shippingCost > 0 ? `Rs. ${shippingCost}` : "Free"}</span>
               </div>
               <div className="border-t pt-3 flex justify-between font-semibold text-lg">
                 <span>Total</span>
                 <span>Rs. {finalTotal.toLocaleString()}</span>
+              </div>
+              <div className="text-xs text-gray-500 dark:text-gray-400 pt-2">
+                {subtotal < 3000 ? 
+                  "Add Rs. " + (3000 - subtotal) + " more to qualify for free shipping" : 
+                  "You've qualified for free shipping!"
+                }
               </div>
             </div>
           </div>
