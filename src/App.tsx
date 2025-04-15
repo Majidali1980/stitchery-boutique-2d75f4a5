@@ -28,6 +28,8 @@ import AdminProductsPage from "@/pages/admin/AdminProductsPage";
 import AdminStitchingOrdersPage from "@/pages/admin/AdminStitchingOrdersPage";
 import AdminLayout from "@/layouts/AdminLayout";
 import AdminLoginPage from "@/pages/admin/AdminLoginPage";
+import SignInPage from "@/pages/auth/SignInPage";
+import SignUpPage from "@/pages/auth/SignUpPage";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY!);
 
@@ -38,7 +40,8 @@ function App() {
   useEffect(() => {
     // Hide footer on certain routes
     const noFooterRoutes = ['/checkout', '/admin', '/admin-login'];
-    setIsFooterVisible(!noFooterRoutes.includes(location.pathname));
+    const hideFooter = noFooterRoutes.some(route => location.pathname.startsWith(route));
+    setIsFooterVisible(!hideFooter);
   }, [location.pathname]);
 
   return (
@@ -67,6 +70,10 @@ function App() {
                   <Route path="/stitching-designs" element={<StitchingDesignsPage />} />
                   <Route path="/custom-stitching/design/:id" element={<DesignDetailPage />} />
                   <Route path="/size-chart" element={<SizeChartPage />} />
+                  
+                  {/* Auth Routes */}
+                  <Route path="/sign-in" element={<SignInPage />} />
+                  <Route path="/sign-up" element={<SignUpPage />} />
                   
                   {/* Admin Routes */}
                   <Route path="/admin-login" element={<AdminLoginPage />} />
