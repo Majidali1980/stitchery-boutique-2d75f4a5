@@ -31,8 +31,12 @@ import AdminLoginPage from "@/pages/admin/AdminLoginPage";
 import SignInPage from "@/pages/auth/SignInPage";
 import SignUpPage from "@/pages/auth/SignUpPage";
 import OrderConfirmationPage from "@/pages/OrderConfirmationPage";
+import AdminCustomersPage from "@/pages/admin/AdminCustomersPage";
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY!);
+// Try to load Stripe key safely
+const stripePromise = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY 
+  ? loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY)
+  : null;
 
 function App() {
   const [isFooterVisible, setIsFooterVisible] = useState(true);
@@ -82,8 +86,11 @@ function App() {
                   <Route path="/admin" element={<AdminLayout />}>
                     <Route index element={<AdminDashboardPage />} />
                     <Route path="orders" element={<AdminOrdersPage />} />
+                    <Route path="orders/pending" element={<AdminOrdersPage statusFilter="pending" />} />
+                    <Route path="orders/completed" element={<AdminOrdersPage statusFilter="delivered" />} />
                     <Route path="stitching-orders" element={<AdminStitchingOrdersPage />} />
                     <Route path="products" element={<AdminProductsPage />} />
+                    <Route path="customers" element={<AdminCustomersPage />} />
                     <Route path="settings" element={<div>Admin Settings</div>} />
                   </Route>
 

@@ -1,5 +1,6 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import {
   BarChart,
   Bar,
@@ -22,25 +23,63 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { orders } from "@/data/orders";
+import { OrderData } from "@/components/admin/orders/utils/orderHelpers";
 import { products } from "@/data/products";
 
 const AdminDashboardPage = () => {
-  // Sales data for chart
-  const monthlySales = [
-    { name: "Jan", sales: 15000 },
-    { name: "Feb", sales: 18000 },
-    { name: "Mar", sales: 22000 },
-    { name: "Apr", sales: 21000 },
-    { name: "May", sales: 25000 },
-    { name: "Jun", sales: 28000 },
-    { name: "Jul", sales: 30000 },
-    { name: "Aug", sales: 29000 },
-    { name: "Sep", sales: 32000 },
-    { name: "Oct", sales: 35000 },
-    { name: "Nov", sales: 40000 },
-    { name: "Dec", sales: 45000 }
-  ];
+  const [orders, setOrders] = useState<OrderData[]>([]);
+  const [timeRange, setTimeRange] = useState("monthly");
+  const [monthlySales, setMonthlySales] = useState<{ name: string; sales: number }[]>([]);
+  
+  useEffect(() => {
+    // Load orders from localStorage
+    const storedOrders = localStorage.getItem('adminOrders');
+    if (storedOrders) {
+      try {
+        const parsedOrders = JSON.parse(storedOrders);
+        setOrders(parsedOrders);
+        
+        // Calculate monthly sales data
+        const monthlyData = generateMonthlySalesData(parsedOrders);
+        setMonthlySales(monthlyData);
+      } catch (error) {
+        console.error("Error loading stored orders:", error);
+      }
+    }
+  }, []);
+
+  // Generate monthly sales data from orders
+  const generateMonthlySalesData = (orders: OrderData[]) => {
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const salesByMonth: Record<string, number> = {};
+    
+    // Initialize all months with 0
+    months.forEach(month => {
+      salesByMonth[month] = 0;
+    });
+    
+    // Sum sales by month
+    orders.forEach(order => {
+      const orderDate = new Date(order.orderDate);
+      const monthName = months[orderDate.getMonth()];
+      salesByMonth[monthName] += order.total;
+    });
+    
+    // Convert to array format for chart
+    return months.map(month => ({
+      name: month,
+      sales: salesByMonth[month]
+    }));
+  };
+
+  // Calculate total revenue from orders
+  const totalRevenue = orders.reduce((sum, order) => sum + order.total, 0);
+  
+  // Calculate revenue change percentage (mock data for now)
+  const revenueChangePercent = orders.length > 0 ? 12 : 0;
+  
+  // Calculate order change percentage (mock data for now)
+  const orderChangePercent = orders.length > 0 ? 5 : 0;
 
   // Product category distribution
   const categoryData = [
@@ -50,15 +89,13 @@ const AdminDashboardPage = () => {
 
   // Order status distribution
   const orderStatusData = [
-    { name: "Pending", value: orders.filter(o => o.status === "pending").length },
-    { name: "Processing", value: orders.filter(o => o.status === "processing").length },
-    { name: "Shipped", value: orders.filter(o => o.status === "shipped").length },
-    { name: "Delivered", value: orders.filter(o => o.status === "delivered").length }
-  ];
+    { name: "Pending", value: orders.filter(o => o.status === "pending").length || 0 },
+    { name: "Processing", value: orders.filter(o => o.status === "processing").length || 0 },
+    { name: "Shipped", value: orders.filter(o => o.status === "shipped").length || 0 },
+    { name: "Delivered", value: orders.filter(o => o.status === "delivered").length || 0 }
+  ].filter(item => item.value > 0);
 
   const COLORS = ["#8B5CF6", "#D946EF", "#ec4899", "#F97316"];
-
-  const [timeRange, setTimeRange] = useState("monthly");
 
   return (
     <div className="space-y-8">
@@ -94,9 +131,11 @@ const AdminDashboardPage = () => {
         <Card>
           <CardHeader className="pb-2">
             <CardDescription>Total Revenue</CardDescription>
-            <CardTitle className="text-3xl">Rs. 340,500</CardTitle>
+            <CardTitle className="text-3xl">Rs. {totalRevenue.toLocaleString()}</CardTitle>
           </CardHeader>
-          <CardContent className="text-sm text-green-600">+12% from last month</CardContent>
+          <CardContent className={`text-sm ${revenueChangePercent > 0 ? 'text-green-600' : 'text-red-600'}`}>
+            {revenueChangePercent > 0 ? '+' : ''}{revenueChangePercent}% from last month
+          </CardContent>
         </Card>
 
         <Card>
@@ -104,7 +143,9 @@ const AdminDashboardPage = () => {
             <CardDescription>Total Orders</CardDescription>
             <CardTitle className="text-3xl">{orders.length}</CardTitle>
           </CardHeader>
-          <CardContent className="text-sm text-green-600">+5% from last month</CardContent>
+          <CardContent className={`text-sm ${orderChangePercent > 0 ? 'text-green-600' : 'text-red-600'}`}>
+            {orderChangePercent > 0 ? '+' : ''}{orderChangePercent}% from last month
+          </CardContent>
         </Card>
 
         <Card>
@@ -188,7 +229,7 @@ const AdminDashboardPage = () => {
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={orderStatusData}
+                    data={orderStatusData.length > 0 ? orderStatusData : [{ name: "No Orders", value: 1 }]}
                     cx="50%"
                     cy="50%"
                     innerRadius={40}
@@ -198,7 +239,7 @@ const AdminDashboardPage = () => {
                     dataKey="value"
                     label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                   >
-                    {orderStatusData.map((entry, index) => (
+                    {(orderStatusData.length > 0 ? orderStatusData : [{ name: "No Orders", value: 1 }]).map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
@@ -214,7 +255,9 @@ const AdminDashboardPage = () => {
         <CardHeader>
           <div className="flex justify-between items-center">
             <CardTitle>Recent Orders</CardTitle>
-            <Button variant="outline" size="sm">View All</Button>
+            <Button variant="outline" size="sm">
+              <Link to="/admin/orders">View All</Link>
+            </Button>
           </div>
         </CardHeader>
         <CardContent>
@@ -230,24 +273,32 @@ const AdminDashboardPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {orders.map((order) => (
-                  <tr key={order.id} className="border-b">
-                    <td className="p-3 text-sm">{order.id}</td>
-                    <td className="p-3 text-sm">{order.customerName}</td>
-                    <td className="p-3 text-sm">{new Date(order.createdAt).toLocaleDateString()}</td>
-                    <td className="p-3 text-sm">Rs. {order.totalAmount.toLocaleString()}</td>
-                    <td className="p-3 text-sm">
-                      <Badge className={
-                        order.status === "delivered" ? "bg-green-500" :
-                        order.status === "shipped" ? "bg-blue-500" :
-                        order.status === "processing" ? "bg-yellow-500" :
-                        "bg-gray-500"
-                      }>
-                        {order.status}
-                      </Badge>
+                {orders.length > 0 ? (
+                  orders.slice(0, 5).map((order) => (
+                    <tr key={order.id} className="border-b">
+                      <td className="p-3 text-sm">{order.id}</td>
+                      <td className="p-3 text-sm">{order.customerName}</td>
+                      <td className="p-3 text-sm">{new Date(order.orderDate).toLocaleDateString()}</td>
+                      <td className="p-3 text-sm">Rs. {order.total.toLocaleString()}</td>
+                      <td className="p-3 text-sm">
+                        <Badge className={
+                          order.status === "delivered" ? "bg-green-100 text-green-800 border-green-200" :
+                          order.status === "shipped" ? "bg-blue-100 text-blue-800 border-blue-200" :
+                          order.status === "processing" ? "bg-yellow-100 text-yellow-800 border-yellow-200" :
+                          "bg-gray-100 text-gray-800 border-gray-200"
+                        }>
+                          {order.status}
+                        </Badge>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={5} className="p-8 text-center text-gray-500">
+                      No orders received yet. New orders will appear here automatically.
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
           </div>

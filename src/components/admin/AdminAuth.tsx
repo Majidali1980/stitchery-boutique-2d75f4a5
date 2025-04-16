@@ -1,7 +1,6 @@
 
 import { useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import { adminLoginInfo } from "@/data/admin-info";
 import { useAuth } from "@clerk/clerk-react";
 import { toast } from "@/components/ui/use-toast";
 
@@ -13,35 +12,30 @@ const AdminAuth = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     if (isLoaded) {
-      // Check if the user is signed in with Clerk
-      if (!isSignedIn || !userId) {
-        setIsAdmin(false);
+      const checkAdminStatus = () => {
+        // For this demo app, we can use localStorage or sessionStorage
+        // for admin authentication - in a real app this would be more secure
+        const adminAuth = 
+          localStorage.getItem('isAdmin') === 'true' || 
+          sessionStorage.getItem('isAdmin') === 'true';
+        
+        // If using Clerk, we can also check for signed in status
+        const clerkAuth = isSignedIn && userId;
+        
+        // Consider admin if either method is true (for flexibility in demo)
+        setIsAdmin(adminAuth || Boolean(clerkAuth));
         setLoading(false);
-        toast({
-          title: "Access denied",
-          description: "Please sign in to continue",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      // For this demo, we're checking against hardcoded admin credentials
-      // In a real app, you'd check against a database
-      const isAuthorized = isSignedIn && (
-        localStorage.getItem('isAdmin') === 'true' || 
-        sessionStorage.getItem('isAdmin') === 'true'
-      );
+        
+        if (!(adminAuth || Boolean(clerkAuth))) {
+          toast({
+            title: "Access denied",
+            description: "Please sign in to access the admin panel",
+            variant: "destructive"
+          });
+        }
+      };
       
-      setIsAdmin(isAuthorized);
-      setLoading(false);
-      
-      if (!isAuthorized) {
-        toast({
-          title: "Access denied",
-          description: "You don't have permission to access the admin panel",
-          variant: "destructive"
-        });
-      }
+      checkAdminStatus();
     }
   }, [isSignedIn, userId, isLoaded]);
 
