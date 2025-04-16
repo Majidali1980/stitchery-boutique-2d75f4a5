@@ -42,9 +42,10 @@ const AdminOrdersPage = () => {
           toast({
             title: "New Order Received",
             description: `Order #${orderData.id} has been placed by ${orderData.customerName}`,
+            duration: 5000,
           });
           
-          // Send email notification (in a real app, this would be a backend API call)
+          // Send email notification
           sendEmailNotification(orderData);
         }
       } catch (error) {
@@ -54,6 +55,16 @@ const AdminOrdersPage = () => {
     
     window.addEventListener('message', receiveOrder);
     
+    // Check for stored orders in localStorage on component mount
+    const storedOrders = localStorage.getItem('adminOrders');
+    if (storedOrders) {
+      try {
+        setOrders(JSON.parse(storedOrders));
+      } catch (error) {
+        console.error("Error loading stored orders:", error);
+      }
+    }
+    
     return () => {
       window.removeEventListener('message', receiveOrder);
     };
@@ -61,7 +72,12 @@ const AdminOrdersPage = () => {
   
   // Add a new order to the admin panel
   const addNewOrder = (orderData: any) => {
-    setOrders(prevOrders => [orderData, ...prevOrders]);
+    setOrders(prevOrders => {
+      const newOrders = [orderData, ...prevOrders];
+      // Store updated orders in localStorage
+      localStorage.setItem('adminOrders', JSON.stringify(newOrders));
+      return newOrders;
+    });
   };
   
   // Send email notification (mock implementation)
@@ -71,7 +87,8 @@ const AdminOrdersPage = () => {
     // In a real app, this would be a backend API call to send an email
     toast({
       title: "Email Notification Sent",
-      description: `Notification sent to alimajid03021980@gmail.com`,
+      description: `Notification sent to alimajid03021980@gmail.com for order #${orderData.id}`,
+      duration: 3000,
     });
   };
   
@@ -93,13 +110,16 @@ const AdminOrdersPage = () => {
   };
   
   const handleUpdateStatus = (orderId: string, newStatus: OrderStatus) => {
-    setOrders(prevOrders => 
-      prevOrders.map(order => 
+    setOrders(prevOrders => {
+      const updatedOrders = prevOrders.map(order => 
         order.id === orderId 
           ? { ...order, status: newStatus } 
           : order
-      )
-    );
+      );
+      // Update localStorage with the new orders state
+      localStorage.setItem('adminOrders', JSON.stringify(updatedOrders));
+      return updatedOrders;
+    });
     
     toast({
       title: "Status Updated",

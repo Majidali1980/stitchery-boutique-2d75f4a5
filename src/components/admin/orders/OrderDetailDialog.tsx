@@ -15,8 +15,9 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
-import { Download, Mail } from "lucide-react";
+import { Download, Mail, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "@/components/ui/use-toast";
 
 type OrderStatus = "pending" | "processing" | "shipped" | "delivered" | "cancelled";
 
@@ -61,6 +62,15 @@ const OrderDetailDialog = ({
     }
   };
 
+  const handleStatusUpdate = (value: string) => {
+    handleUpdateStatus(selectedOrder.id, value as OrderStatus);
+    toast({
+      title: "Status Updated",
+      description: `Order ${selectedOrder.id} status changed to ${value}`,
+      duration: 3000,
+    });
+  };
+
   return (
     <Dialog open={!!selectedOrder} onOpenChange={handleCloseDialog}>
       <DialogContent className="max-w-3xl">
@@ -100,6 +110,11 @@ const OrderDetailDialog = ({
                   <Mail className="h-4 w-4 text-brand-gold" />
                   <span className="text-sm">Notifications sent to: alimajid03021980@gmail.com</span>
                 </div>
+                
+                <div className="flex items-center space-x-2 mt-1">
+                  <Clock className="h-4 w-4 text-brand-gold" />
+                  <span className="text-sm">Expected delivery: 3-5 business days</span>
+                </div>
               </div>
               
               <div className="space-y-4">
@@ -126,9 +141,7 @@ const OrderDetailDialog = ({
                   <div className="flex items-center gap-2 mt-2">
                     <Select 
                       defaultValue={selectedOrder.status}
-                      onValueChange={(value) => {
-                        handleUpdateStatus(selectedOrder.id, value as OrderStatus);
-                      }}
+                      onValueChange={handleStatusUpdate}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Select status" />
@@ -141,7 +154,6 @@ const OrderDetailDialog = ({
                         <SelectItem value="cancelled">Cancelled</SelectItem>
                       </SelectContent>
                     </Select>
-                    <Button>Update</Button>
                   </div>
                 </div>
               </div>
@@ -185,6 +197,19 @@ const OrderDetailDialog = ({
                     <div className="mt-2 text-sm">
                       <span className="font-medium">Fabric: </span>
                       {item.fabric}
+                    </div>
+                  )}
+                  
+                  {item.selectedSize && (
+                    <div className="mt-2 text-sm">
+                      <span className="font-medium">Size: </span>
+                      {item.selectedSize}
+                      {item.selectedColor && (
+                        <span className="ml-3">
+                          <span className="font-medium">Color: </span>
+                          {item.selectedColor}
+                        </span>
+                      )}
                     </div>
                   )}
                 </div>

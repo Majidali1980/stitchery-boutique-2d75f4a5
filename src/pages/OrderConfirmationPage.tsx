@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, ShoppingBag, FileText, Image, Ruler } from "lucide-react";
+import { CheckCircle, ShoppingBag, FileText, Image, Ruler, Clock } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { CartItemType } from "@/types/stitching";
 
@@ -12,10 +12,14 @@ const OrderConfirmationPage = () => {
   const [orderDate] = useState(new Date());
   const location = useLocation();
   const [orderItems, setOrderItems] = useState<CartItemType[]>([]);
+  const { clearCart } = useCart();
   
   useEffect(() => {
     // Scroll to top when component mounts
     window.scrollTo(0, 0);
+    
+    // Clear cart after order is placed
+    clearCart();
     
     // Get order items from state if available
     if (location.state && location.state.orderItems) {
@@ -28,7 +32,7 @@ const OrderConfirmationPage = () => {
           customerName: location.state.customerInfo?.firstName + " " + location.state.customerInfo?.lastName || "Customer",
           customerPhone: location.state.customerInfo?.phone || "N/A",
           customerEmail: location.state.customerInfo?.email || "N/A",
-          orderDate: orderDate.toISOString().split('T')[0],
+          orderDate: orderDate.toISOString(),
           total: location.state.totalAmount || 0,
           status: "pending",
           items: location.state.orderItems.map((item: CartItemType) => {
@@ -62,16 +66,19 @@ const OrderConfirmationPage = () => {
             
             return baseItem;
           }),
-          shippingAddress: `${location.state.customerInfo?.address}, ${location.state.customerInfo?.city}, ${location.state.customerInfo?.state}`
+          shippingAddress: `${location.state.customerInfo?.address}, ${location.state.customerInfo?.city}, ${location.state.customerInfo?.state}, ${location.state.customerInfo?.zip || ""}`
         };
         
-        // Send order to admin panel
-        window.postMessage(`NEW_ORDER:${JSON.stringify(orderData)}`, window.location.origin);
+        // Send order to admin panel with a slight delay to ensure it's properly received
+        setTimeout(() => {
+          window.postMessage(`NEW_ORDER:${JSON.stringify(orderData)}`, window.location.origin);
+          console.log("Order sent to admin panel:", orderData);
+        }, 500);
       } catch (error) {
         console.error("Error sending order notification:", error);
       }
     }
-  }, [location, orderNumber, orderDate]);
+  }, [location, orderNumber, orderDate, clearCart]);
   
   // Format measurements for display
   const formatMeasurements = (measurements: Record<string, number>) => {

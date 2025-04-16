@@ -1,5 +1,4 @@
 
-import { useState } from "react";
 import { 
   Table, 
   TableBody, 
@@ -11,6 +10,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown, Calendar, Eye } from "lucide-react";
+import { getFormattedDate } from "./utils/orderHelpers";
 
 type OrderStatus = "pending" | "processing" | "shipped" | "delivered" | "cancelled";
 type SortField = "id" | "customerName" | "orderDate" | "total" | "status";
@@ -31,15 +31,6 @@ const OrdersTable = ({
   handleViewOrder 
 }: OrdersTableProps) => {
   
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-GB", {
-      day: "numeric",
-      month: "short",
-      year: "numeric"
-    });
-  };
-
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "pending":
@@ -68,7 +59,7 @@ const OrdersTable = ({
                 onClick={() => handleSort("id")}
               >
                 Order ID
-                <ArrowUpDown className="ml-2 h-4 w-4" />
+                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortField === 'id' ? 'text-primary' : 'text-muted-foreground'}`} />
               </div>
             </TableHead>
             <TableHead>
@@ -77,7 +68,7 @@ const OrdersTable = ({
                 onClick={() => handleSort("customerName")}
               >
                 Customer
-                <ArrowUpDown className="ml-2 h-4 w-4" />
+                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortField === 'customerName' ? 'text-primary' : 'text-muted-foreground'}`} />
               </div>
             </TableHead>
             <TableHead>
@@ -86,7 +77,7 @@ const OrdersTable = ({
                 onClick={() => handleSort("orderDate")}
               >
                 Date
-                <ArrowUpDown className="ml-2 h-4 w-4" />
+                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortField === 'orderDate' ? 'text-primary' : 'text-muted-foreground'}`} />
               </div>
             </TableHead>
             <TableHead>
@@ -95,7 +86,7 @@ const OrdersTable = ({
                 onClick={() => handleSort("total")}
               >
                 Total
-                <ArrowUpDown className="ml-2 h-4 w-4" />
+                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortField === 'total' ? 'text-primary' : 'text-muted-foreground'}`} />
               </div>
             </TableHead>
             <TableHead>
@@ -104,7 +95,7 @@ const OrdersTable = ({
                 onClick={() => handleSort("status")}
               >
                 Status
-                <ArrowUpDown className="ml-2 h-4 w-4" />
+                <ArrowUpDown className={`ml-2 h-4 w-4 ${sortField === 'status' ? 'text-primary' : 'text-muted-foreground'}`} />
               </div>
             </TableHead>
             <TableHead className="text-right">Actions</TableHead>
@@ -122,7 +113,7 @@ const OrdersTable = ({
                 <TableCell>
                   <div className="flex items-center">
                     <Calendar className="mr-2 h-4 w-4 text-muted-foreground" />
-                    {formatDate(order.orderDate)}
+                    {getFormattedDate(order.orderDate)}
                   </div>
                 </TableCell>
                 <TableCell>Rs. {order.total.toLocaleString()}</TableCell>
@@ -142,10 +133,7 @@ const OrdersTable = ({
           ) : (
             <TableRow>
               <TableCell colSpan={6} className="text-center py-6 text-muted-foreground">
-                {orders.length === 0 
-                  ? "No orders received yet. New orders will appear here automatically."
-                  : "No orders found matching your filters."
-                }
+                No orders received yet. New orders will appear here automatically.
               </TableCell>
             </TableRow>
           )}

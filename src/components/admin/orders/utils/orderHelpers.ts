@@ -2,21 +2,48 @@
 type OrderStatus = "pending" | "processing" | "shipped" | "delivered" | "cancelled";
 type SortField = "id" | "customerName" | "orderDate" | "total" | "status";
 
+export interface OrderItem {
+  name: string;
+  price: number;
+  quantity: number;
+  type: 'product' | 'stitching';
+  designId?: string;
+  measurements?: Record<string, number>;
+  fabric?: string;
+  designImage?: string | null;
+  selectedSize?: string;
+  selectedColor?: string;
+}
+
+export interface OrderData {
+  id: string;
+  customerName: string;
+  customerPhone: string;
+  customerEmail: string;
+  orderDate: string;
+  total: number;
+  status: OrderStatus;
+  items: OrderItem[];
+  shippingAddress: string;
+}
+
 export const filterOrders = (
-  orders: any[],
+  orders: OrderData[],
   searchTerm: string,
   statusFilter: OrderStatus | "all"
 ) => {
   return orders
     .filter(order => 
-      order.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.id.toLowerCase().includes(searchTerm.toLowerCase())
+      order.customerName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.customerEmail?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.customerPhone?.toLowerCase().includes(searchTerm.toLowerCase())
     )
     .filter(order => statusFilter === "all" || order.status === statusFilter);
 };
 
 export const sortOrders = (
-  orders: any[],
+  orders: OrderData[],
   sortField: SortField,
   sortDirection: "asc" | "desc"
 ) => {
@@ -33,10 +60,19 @@ export const sortOrders = (
         : b[sortField] - a[sortField];
     }
     
-    const valueA = String(a[sortField]).toLowerCase();
-    const valueB = String(b[sortField]).toLowerCase();
+    const valueA = String(a[sortField] || '').toLowerCase();
+    const valueB = String(b[sortField] || '').toLowerCase();
     return sortDirection === "asc" 
       ? valueA.localeCompare(valueB) 
       : valueB.localeCompare(valueA);
+  });
+};
+
+export const getFormattedDate = (dateString: string) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric"
   });
 };
