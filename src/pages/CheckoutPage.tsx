@@ -58,10 +58,20 @@ const CheckoutPage = () => {
     
     // In a real app, process payment and create order here
     
+    // Save order items before clearing cart
+    const orderItems = [...items];
+    const customerInfo = { ...formData };
+    
     // Simulate order creation
     setTimeout(() => {
       clearCart();
-      navigate("/order-confirmation");
+      navigate("/order-confirmation", { 
+        state: { 
+          orderItems,
+          customerInfo,
+          totalAmount: finalTotal
+        }
+      });
     }, 1000);
   };
   

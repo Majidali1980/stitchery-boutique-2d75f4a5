@@ -1,17 +1,64 @@
 
-import { useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, ShoppingBag } from "lucide-react";
+import { CheckCircle, ShoppingBag, FileText, Image, Ruler } from "lucide-react";
+import { useCart } from "@/context/CartContext";
+import { CartItemType } from "@/types/stitching";
 
 const OrderConfirmationPage = () => {
   // Generate a random order number
   const orderNumber = `MA-${Math.floor(100000 + Math.random() * 900000)}`;
+  const [orderDate] = useState(new Date());
+  const location = useLocation();
+  const [orderItems, setOrderItems] = useState<CartItemType[]>([]);
   
   useEffect(() => {
     // Scroll to top when component mounts
     window.scrollTo(0, 0);
-  }, []);
+    
+    // Get order items from state if available
+    if (location.state && location.state.orderItems) {
+      setOrderItems(location.state.orderItems);
+      
+      // Send order notification to admin panel
+      try {
+        const orderData = {
+          id: orderNumber,
+          customerName: location.state.customerInfo?.firstName + " " + location.state.customerInfo?.lastName || "Customer",
+          customerPhone: location.state.customerInfo?.phone || "N/A",
+          customerEmail: location.state.customerInfo?.email || "N/A",
+          orderDate: orderDate.toISOString().split('T')[0],
+          total: location.state.totalAmount || 0,
+          status: "pending",
+          items: location.state.orderItems.map((item: CartItemType) => ({
+            name: item.type === 'product' ? item.product.name : 
+              `Custom ${item.service.garmentType.charAt(0).toUpperCase() + item.service.garmentType.slice(1).replace(/-/g, ' ')}`,
+            price: item.type === 'product' ? item.product.price : item.service.price,
+            quantity: item.quantity,
+            type: item.type,
+            designId: item.type === 'stitching' ? item.service.designId : undefined
+          })),
+          shippingAddress: `${location.state.customerInfo?.address}, ${location.state.customerInfo?.city}, ${location.state.customerInfo?.state}`
+        };
+        
+        // Send order to admin panel (in a real app, this would be a backend API call)
+        window.postMessage(`NEW_ORDER:${JSON.stringify(orderData)}`, window.location.origin);
+      } catch (error) {
+        console.error("Error sending order notification:", error);
+      }
+    }
+  }, [location, orderNumber, orderDate]);
+  
+  // Format measurements for display
+  const formatMeasurements = (measurements: Record<string, number>) => {
+    return Object.entries(measurements).map(([key, value]) => (
+      <div key={key} className="grid grid-cols-2 text-sm border-b py-1">
+        <span className="capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}:</span>
+        <span>{value} inches</span>
+      </div>
+    ));
+  };
   
   return (
     <div className="container py-16 max-w-3xl mx-auto">
@@ -33,7 +80,7 @@ const OrderConfirmationPage = () => {
             </div>
             <div>
               <p className="text-sm text-gray-500">Order Date</p>
-              <p className="font-medium">{new Date().toLocaleDateString()}</p>
+              <p className="font-medium">{orderDate.toLocaleDateString()}</p>
             </div>
             <div>
               <p className="text-sm text-gray-500">Status</p>
@@ -44,9 +91,83 @@ const OrderConfirmationPage = () => {
           </div>
           
           <h2 className="font-semibold text-lg mb-3">Order Details</h2>
-          <p className="text-gray-600 mb-6">
-            We'll send an email confirmation to your registered email address with all the order details.
-          </p>
+          
+          {orderItems.length > 0 ? (
+            <div className="space-y-4 mb-6">
+              {orderItems.map((item, index) => (
+                <div key={index} className="border rounded-md p-4">
+                  <div className="flex justify-between items-start mb-3">
+                    <h3 className="font-medium">
+                      {item.type === 'product' ? item.product.name : 
+                        `Custom ${item.service.garmentType.charAt(0).toUpperCase() + 
+                          item.service.garmentType.slice(1).replace(/-/g, ' ')}`}
+                    </h3>
+                    <span className="font-semibold">
+                      Rs. {item.type === 'product' ? 
+                        (item.product.price * item.quantity).toLocaleString() : 
+                        (item.service.price * item.quantity).toLocaleString()}
+                    </span>
+                  </div>
+                  
+                  <p className="text-sm text-gray-500 mb-2">Quantity: {item.quantity}</p>
+                  
+                  {item.type === 'stitching' && (
+                    <div className="space-y-2 mt-2">
+                      {item.service.designId && (
+                        <div className="flex items-center text-sm">
+                          <FileText size={16} className="mr-2 text-brand-gold" />
+                          <span className="text-gray-700">Design: #{item.service.designId}</span>
+                        </div>
+                      )}
+                      
+                      {item.service.serviceType && (
+                        <div className="flex items-center text-sm">
+                          <Ruler size={16} className="mr-2 text-brand-gold" />
+                          <span className="text-gray-700">Service Type: {item.service.serviceType.charAt(0).toUpperCase() + item.service.serviceType.slice(1)}</span>
+                        </div>
+                      )}
+                      
+                      {item.service.fabric && (
+                        <div className="text-sm">
+                          <span className="text-gray-700">Fabric: {item.service.fabric}</span>
+                        </div>
+                      )}
+                      
+                      {Object.keys(item.service.measurements || {}).length > 0 && (
+                        <div>
+                          <p className="text-sm font-medium mb-1">Measurements:</p>
+                          <div className="bg-gray-50 p-2 rounded-md">
+                            {formatMeasurements(item.service.measurements)}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {item.service.designImage && (
+                        <div>
+                          <p className="text-sm font-medium mb-1">Design Reference:</p>
+                          <div className="flex items-center">
+                            <Image size={16} className="mr-2 text-brand-gold" />
+                            <span className="text-sm text-gray-600">Design image attached</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  
+                  {item.type === 'product' && item.selectedSize && (
+                    <div className="text-sm text-gray-600 mt-1">
+                      Size: {item.selectedSize}
+                      {item.selectedColor && <span className="ml-2">Color: {item.selectedColor}</span>}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-600 mb-6">
+              We'll send an email confirmation to your registered email address with all the order details.
+            </p>
+          )}
           
           <div className="space-y-4">
             <div className="flex items-center space-x-2">

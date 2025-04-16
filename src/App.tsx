@@ -30,6 +30,7 @@ import AdminLayout from "@/layouts/AdminLayout";
 import AdminLoginPage from "@/pages/admin/AdminLoginPage";
 import SignInPage from "@/pages/auth/SignInPage";
 import SignUpPage from "@/pages/auth/SignUpPage";
+import OrderConfirmationPage from "@/pages/OrderConfirmationPage";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY!);
 
@@ -64,6 +65,7 @@ function App() {
                   <Route path="/cart" element={<CartPage />} />
                   <Route path="/wishlist" element={<WishlistPage />} />
                   <Route path="/checkout" element={<CheckoutPage />} />
+                  <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
                   <Route path="/contact" element={<ContactPage />} />
                   <Route path="/about" element={<AboutPage />} />
                   <Route path="/custom-stitching" element={<CustomStitchingPage />} />
@@ -80,10 +82,8 @@ function App() {
                   <Route path="/admin" element={<AdminLayout />}>
                     <Route index element={<AdminDashboardPage />} />
                     <Route path="orders" element={<AdminOrdersPage />} />
-                    <Route path="orders/pending" element={<AdminStitchingOrdersPage />} />
-                    <Route path="orders/completed" element={<AdminStitchingOrdersPage />} />
+                    <Route path="stitching-orders" element={<AdminStitchingOrdersPage />} />
                     <Route path="products" element={<AdminProductsPage />} />
-                    <Route path="customers" element={<div>Customers Management</div>} />
                     <Route path="settings" element={<div>Admin Settings</div>} />
                   </Route>
 
