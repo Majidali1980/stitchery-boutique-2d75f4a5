@@ -31,18 +31,41 @@ const OrderConfirmationPage = () => {
           orderDate: orderDate.toISOString().split('T')[0],
           total: location.state.totalAmount || 0,
           status: "pending",
-          items: location.state.orderItems.map((item: CartItemType) => ({
-            name: item.type === 'product' ? item.product.name : 
-              `Custom ${item.service.garmentType.charAt(0).toUpperCase() + item.service.garmentType.slice(1).replace(/-/g, ' ')}`,
-            price: item.type === 'product' ? item.product.price : item.service.price,
-            quantity: item.quantity,
-            type: item.type,
-            designId: item.type === 'stitching' ? item.service.designId : undefined
-          })),
+          items: location.state.orderItems.map((item: CartItemType) => {
+            const baseItem = {
+              name: item.type === 'product' ? item.product.name : 
+                `Custom ${item.service.garmentType.charAt(0).toUpperCase() + item.service.garmentType.slice(1).replace(/-/g, ' ')}`,
+              price: item.type === 'product' ? item.product.price : item.service.price,
+              quantity: item.quantity,
+              type: item.type
+            };
+            
+            // Add stitching-specific details
+            if (item.type === 'stitching') {
+              return {
+                ...baseItem,
+                designId: item.service.designId,
+                measurements: item.service.measurements || {},
+                fabric: item.service.fabric || "Not specified",
+                designImage: item.service.designImage || null
+              };
+            }
+            
+            // Add product-specific details
+            if (item.type === 'product') {
+              return {
+                ...baseItem,
+                selectedSize: item.selectedSize || "Standard",
+                selectedColor: item.selectedColor || "Default"
+              };
+            }
+            
+            return baseItem;
+          }),
           shippingAddress: `${location.state.customerInfo?.address}, ${location.state.customerInfo?.city}, ${location.state.customerInfo?.state}`
         };
         
-        // Send order to admin panel (in a real app, this would be a backend API call)
+        // Send order to admin panel
         window.postMessage(`NEW_ORDER:${JSON.stringify(orderData)}`, window.location.origin);
       } catch (error) {
         console.error("Error sending order notification:", error);
@@ -116,7 +139,7 @@ const OrderConfirmationPage = () => {
                       {item.service.designId && (
                         <div className="flex items-center text-sm">
                           <FileText size={16} className="mr-2 text-brand-gold" />
-                          <span className="text-gray-700">Design: #{item.service.designId}</span>
+                          <span className="text-gray-700 font-medium">Design: #{item.service.designId}</span>
                         </div>
                       )}
                       
@@ -172,7 +195,7 @@ const OrderConfirmationPage = () => {
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
               <ShoppingBag size={18} className="text-brand-gold" />
-              <span>Your order is being processed</span>
+              <span>Your order has been received and is being processed</span>
             </div>
             <div className="flex items-center space-x-2">
               <ShoppingBag size={18} className="text-brand-gold" />

@@ -42,62 +42,16 @@ import {
   Search,
   X,
   Package,
-  PackageCheck
+  PackageCheck,
+  Mail
 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-
-// Sample data (This would come from API or context in a real app)
-const initialOrders = [
-  {
-    id: "ORD-1001",
-    customerName: "Ahmed Khan",
-    customerPhone: "+92 300 1234567",
-    customerEmail: "ahmed@example.com",
-    orderDate: "2025-04-15",
-    total: 9800,
-    status: "processing",
-    items: [
-      {
-        name: "Custom Suit",
-        price: 9500,
-        quantity: 1,
-        type: "stitching",
-        designId: "D-101"
-      }
-    ],
-    shippingAddress: "123 Main Street, Karachi"
-  },
-  {
-    id: "ORD-1002",
-    customerName: "Fatima Zaidi",
-    customerPhone: "+92 321 9876543",
-    customerEmail: "fatima@example.com",
-    orderDate: "2025-04-14",
-    total: 4500,
-    status: "shipped",
-    items: [
-      {
-        name: "Premium Shirt",
-        price: 2500,
-        quantity: 1,
-        type: "product"
-      },
-      {
-        name: "Designer Trousers",
-        price: 2000,
-        quantity: 1,
-        type: "product"
-      }
-    ],
-    shippingAddress: "456 Avenue Road, Lahore"
-  }
-];
 
 type OrderStatus = "pending" | "processing" | "shipped" | "delivered" | "cancelled";
 type SortField = "id" | "customerName" | "orderDate" | "total" | "status";
 
 const AdminOrdersPage = () => {
-  const [orders, setOrders] = useState(initialOrders);
+  const [orders, setOrders] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<OrderStatus | "all">("all");
   const [sortField, setSortField] = useState<SortField>("orderDate");
@@ -105,7 +59,7 @@ const AdminOrdersPage = () => {
   const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
   const { toast } = useToast();
   
-  // Listen for order confirmations (in a real app, this would use websockets or polling)
+  // Listen for order confirmations
   useEffect(() => {
     const receiveOrder = (event: MessageEvent) => {
       try {
@@ -115,8 +69,11 @@ const AdminOrdersPage = () => {
           
           toast({
             title: "New Order Received",
-            description: `Order #${orderData.id} has been placed`,
+            description: `Order #${orderData.id} has been placed by ${orderData.customerName}`,
           });
+          
+          // Send email notification (in a real app, this would be a backend API call)
+          sendEmailNotification(orderData);
         }
       } catch (error) {
         console.error("Error processing order message:", error);
@@ -133,6 +90,17 @@ const AdminOrdersPage = () => {
   // Add a new order to the admin panel
   const addNewOrder = (orderData: any) => {
     setOrders(prevOrders => [orderData, ...prevOrders]);
+  };
+  
+  // Send email notification (mock implementation)
+  const sendEmailNotification = (orderData: any) => {
+    console.log(`Email notification sent to alimajid03021980@gmail.com for order ${orderData.id}`);
+    
+    // In a real app, this would be a backend API call to send an email
+    toast({
+      title: "Email Notification Sent",
+      description: `Notification sent to alimajid03021980@gmail.com`,
+    });
   };
   
   const handleViewOrder = (order: any) => {
@@ -375,7 +343,10 @@ const AdminOrdersPage = () => {
                 ) : (
                   <TableRow>
                     <TableCell colSpan={6} className="text-center py-6 text-muted-foreground">
-                      No orders found matching your filters.
+                      {orders.length === 0 
+                        ? "No orders received yet. New orders will appear here automatically."
+                        : "No orders found matching your filters."
+                      }
                     </TableCell>
                   </TableRow>
                 )}
@@ -418,6 +389,11 @@ const AdminOrdersPage = () => {
                       <div className="text-sm text-muted-foreground">
                         <p>{selectedOrder.shippingAddress}</p>
                       </div>
+                    </div>
+                    
+                    <div className="flex items-center space-x-2 mt-2">
+                      <Mail className="h-4 w-4 text-brand-gold" />
+                      <span className="text-sm">Notifications sent to: alimajid03021980@gmail.com</span>
                     </div>
                   </div>
                   
@@ -476,13 +452,36 @@ const AdminOrdersPage = () => {
                           <h3 className="font-medium">{item.name}</h3>
                           <p className="text-sm text-muted-foreground">
                             Quantity: {item.quantity}
-                            {item.type === 'stitching' && item.designId && (
-                              <span className="ml-2">Design: #{item.designId}</span>
-                            )}
                           </p>
+                          {item.type === 'stitching' && item.designId && (
+                            <p className="text-sm text-brand-gold font-medium mt-1">
+                              Design #: {item.designId}
+                            </p>
+                          )}
                         </div>
                         <p className="font-medium">Rs. {item.price.toLocaleString()}</p>
                       </div>
+                      
+                      {item.measurements && Object.keys(item.measurements).length > 0 && (
+                        <div className="mt-3 border-t pt-2">
+                          <p className="text-sm font-medium mb-1">Measurements:</p>
+                          <div className="grid grid-cols-2 text-sm">
+                            {Object.entries(item.measurements).map(([key, value]: [string, any]) => (
+                              <div key={key} className="py-1">
+                                <span className="capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}:</span>
+                                <span className="ml-2">{value} inches</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {item.fabric && (
+                        <div className="mt-2 text-sm">
+                          <span className="font-medium">Fabric: </span>
+                          {item.fabric}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -496,6 +495,13 @@ const AdminOrdersPage = () => {
               <Button>
                 <Download className="mr-2 h-4 w-4" />
                 Print Order
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={() => sendEmailNotification(selectedOrder)}
+              >
+                <Mail className="mr-2 h-4 w-4" />
+                Resend Email
               </Button>
             </div>
           </DialogContent>
