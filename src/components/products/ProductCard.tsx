@@ -68,7 +68,7 @@ const ProductCard = ({ product, className }: ProductCardProps) => {
               <ShoppingCart size={18} />
             </Button>
             
-            <Link to={`/products/${product.id}`}>
+            <Link to={`/products/${product.id}`} onClick={(e) => e.stopPropagation()}>
               <Button 
                 size="icon" 
                 variant="secondary" 

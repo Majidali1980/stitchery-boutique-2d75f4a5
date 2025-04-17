@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { 
@@ -16,7 +17,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { toast } from "@/components/ui/use-toast";
-import { getProductById, products, getProductsByCategory } from "@/data/products";
+import { getProductById, getProductsByCategory } from "@/data/products";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import ProductGrid from "@/components/products/ProductGrid";
@@ -169,12 +170,12 @@ const ReviewForm = ({ productId, onSubmit }: ReviewFormProps) => {
 };
 
 const ProductDetailPage = () => {
-  const { id } = useParams<{ id: string }>();
+  const { productId } = useParams<{ productId: string }>();
   const navigate = useNavigate();
   const { addToCart } = useCart();
   const { addItem: addToWishlist, isInWishlist } = useWishlist();
   
-  const product = getProductById(id || "");
+  const product = getProductById(productId || "");
   
   if (!product) {
     navigate("/products");
@@ -247,13 +248,14 @@ const ProductDetailPage = () => {
     });
   };
   
-  const relatedProducts = products
-    .filter(p => p.category === product.category && p.id !== product.id)
+  // Get related and similar products
+  const relatedProducts = getProductsByCategory(product.category)
+    .filter(p => p.id !== product.id)
     .slice(0, 4);
 
-  const similarTypeProducts = products
-    .filter(p => p.type === product.type && p.id !== product.id && p.category !== product.category)
-    .slice(0, 4);
+  const similarTypeProducts = getProductById("")
+    ? []
+    : [];
   
   return (
     <div className="container py-10">
