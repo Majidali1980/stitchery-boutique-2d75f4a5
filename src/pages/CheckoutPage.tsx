@@ -56,20 +56,21 @@ const CheckoutPage = () => {
       return;
     }
     
-    // In a real app, process payment and create order here
-    
     // Save order items before clearing cart
     const orderItems = [...items];
     const customerInfo = { ...formData };
     
+    // Generate stable order number
+    const orderNumber = `MA-${Math.floor(100000 + Math.random() * 900000)}`;
+    
     // Simulate order creation
     setTimeout(() => {
-      clearCart();
       navigate("/order-confirmation", { 
         state: { 
           orderItems,
           customerInfo,
-          totalAmount: finalTotal
+          totalAmount: finalTotal,
+          orderNumber
         }
       });
     }, 1000);

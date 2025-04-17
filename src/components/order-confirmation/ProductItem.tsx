@@ -1,6 +1,6 @@
 
 import { CartItemType } from "@/types/stitching";
-import { FileText, Image, Ruler } from "lucide-react";
+import { FileText, Image, Ruler, Box } from "lucide-react";
 
 interface ProductItemProps {
   item: CartItemType;
@@ -19,13 +19,20 @@ const ProductItem = ({ item, index }: ProductItemProps) => {
   };
 
   return (
-    <div key={index} className="border rounded-md p-4">
+    <div key={index} className="border rounded-md p-4 hover:border-brand-gold transition-colors">
       <div className="flex justify-between items-start mb-3">
-        <h3 className="font-medium">
-          {item.type === 'product' ? item.product.name : 
-            `Custom ${item.service.garmentType.charAt(0).toUpperCase() + 
-              item.service.garmentType.slice(1).replace(/-/g, ' ')}`}
-        </h3>
+        <div className="flex items-center gap-2">
+          {item.type === 'product' ? (
+            <Box size={18} className="text-brand-gold" />
+          ) : (
+            <Ruler size={18} className="text-brand-gold" />
+          )}
+          <h3 className="font-medium">
+            {item.type === 'product' ? item.product.name : 
+              `Custom ${item.service.garmentType.charAt(0).toUpperCase() + 
+                item.service.garmentType.slice(1).replace(/-/g, ' ')}`}
+          </h3>
+        </div>
         <span className="font-semibold">
           Rs. {item.type === 'product' ? 
             (item.product.price * item.quantity).toLocaleString() : 
