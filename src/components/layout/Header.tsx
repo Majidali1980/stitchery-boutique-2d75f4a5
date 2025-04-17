@@ -1,13 +1,14 @@
 
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, ShoppingBag, Heart, Sun, Moon } from "lucide-react";
+import { Menu, X, ShoppingBag, Heart, Sun, Moon, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/context/ThemeContext";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import AuthButtons from "@/components/auth/AuthButtons";
+import { adminLoginInfo } from "@/data/admin-info";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -90,6 +91,14 @@ const Header = () => {
             )}
           </button>
 
+          {/* Admin Login */}
+          <Link to="/admin-login" className="p-2 relative group">
+            <Shield className="h-5 w-5" />
+            <div className="absolute -bottom-10 right-0 bg-white dark:bg-gray-800 shadow-lg rounded-md p-2 text-xs opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap">
+              Admin: {adminLoginInfo.email}
+            </div>
+          </Link>
+
           {/* Wishlist */}
           <Link to="/wishlist" className="relative p-2">
             <Heart className="h-5 w-5" />
@@ -141,6 +150,13 @@ const Header = () => {
                 {item.name}
               </Link>
             ))}
+            <Link
+              to="/admin-login"
+              className="text-gray-700 dark:text-gray-200 hover:text-brand-gold dark:hover:text-brand-gold transition-colors py-2"
+              onClick={toggleMenu}
+            >
+              Admin Login
+            </Link>
           </nav>
         </div>
       )}

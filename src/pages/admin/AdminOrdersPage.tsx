@@ -18,6 +18,7 @@ import OrdersTable from "@/components/admin/orders/OrdersTable";
 import OrderDetailDialog from "@/components/admin/orders/OrderDetailDialog";
 import { filterOrders, sortOrders, OrderData } from "@/components/admin/orders/utils/orderHelpers";
 import { useLocation } from "react-router-dom";
+import { useOrders } from "@/services/cmsService";
 
 type OrderStatus = "pending" | "processing" | "shipped" | "delivered" | "cancelled";
 type SortField = "id" | "customerName" | "orderDate" | "total" | "status";
@@ -27,7 +28,6 @@ interface AdminOrdersPageProps {
 }
 
 const AdminOrdersPage = ({ statusFilter: initialStatusFilter }: AdminOrdersPageProps) => {
-  const [orders, setOrders] = useState<OrderData[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<OrderStatus | "all">(initialStatusFilter || "all");
   const [sortField, setSortField] = useState<SortField>("orderDate");
@@ -35,6 +35,9 @@ const AdminOrdersPage = ({ statusFilter: initialStatusFilter }: AdminOrdersPageP
   const [selectedOrder, setSelectedOrder] = useState<OrderData | null>(null);
   const { toast } = useToast();
   const location = useLocation();
+  
+  // Use our custom hook to fetch orders from CMS
+  const { orders, loading, error, addOrder, updateOrderStatus } = useOrders();
   
   useEffect(() => {
     // Update status filter based on props or URL path
@@ -53,7 +56,7 @@ const AdminOrdersPage = ({ statusFilter: initialStatusFilter }: AdminOrdersPageP
       try {
         if (event.data && typeof event.data === 'string' && event.data.startsWith('NEW_ORDER:')) {
           const orderData = JSON.parse(event.data.replace('NEW_ORDER:', ''));
-          addNewOrder(orderData);
+          addOrder(orderData);
           
           toast({
             title: "New Order Received",
@@ -71,30 +74,10 @@ const AdminOrdersPage = ({ statusFilter: initialStatusFilter }: AdminOrdersPageP
     
     window.addEventListener('message', receiveOrder);
     
-    // Check for stored orders in localStorage on component mount
-    const storedOrders = localStorage.getItem('adminOrders');
-    if (storedOrders) {
-      try {
-        setOrders(JSON.parse(storedOrders));
-      } catch (error) {
-        console.error("Error loading stored orders:", error);
-      }
-    }
-    
     return () => {
       window.removeEventListener('message', receiveOrder);
     };
-  }, [toast]);
-  
-  // Add a new order to the admin panel
-  const addNewOrder = (orderData: OrderData) => {
-    setOrders(prevOrders => {
-      const newOrders = [orderData, ...prevOrders];
-      // Store updated orders in localStorage
-      localStorage.setItem('adminOrders', JSON.stringify(newOrders));
-      return newOrders;
-    });
-  };
+  }, [toast, addOrder]);
   
   // Send email notification (mock implementation)
   const sendEmailNotification = (orderData: OrderData) => {
@@ -126,16 +109,7 @@ const AdminOrdersPage = ({ statusFilter: initialStatusFilter }: AdminOrdersPageP
   };
   
   const handleUpdateStatus = (orderId: string, newStatus: OrderStatus) => {
-    setOrders(prevOrders => {
-      const updatedOrders = prevOrders.map(order => 
-        order.id === orderId 
-          ? { ...order, status: newStatus } 
-          : order
-      );
-      // Update localStorage with the new orders state
-      localStorage.setItem('adminOrders', JSON.stringify(updatedOrders));
-      return updatedOrders;
-    });
+    updateOrderStatus(orderId, newStatus);
     
     toast({
       title: "Status Updated",
@@ -173,6 +147,23 @@ const AdminOrdersPage = ({ statusFilter: initialStatusFilter }: AdminOrdersPageP
     sortField,
     sortDirection
   );
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin h-12 w-12 border-4 border-brand-gold border-t-transparent rounded-full"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6 bg-red-50 border border-red-200 rounded-md">
+        <h2 className="text-xl font-semibold text-red-700">Error</h2>
+        <p className="text-red-600">{error}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@clerk/clerk-react";
 import { toast } from "@/components/ui/use-toast";
+import { adminLoginInfo } from "@/data/admin-info";
 
 const AdminAuth = ({ children }: { children: React.ReactNode }) => {
   const { isSignedIn, userId, isLoaded } = useAuth();
@@ -13,8 +14,8 @@ const AdminAuth = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     if (isLoaded) {
       const checkAdminStatus = () => {
-        // For this demo app, we can use localStorage or sessionStorage
-        // for admin authentication - in a real app this would be more secure
+        // For this demo app, we use localStorage or sessionStorage
+        // for admin authentication
         const adminAuth = 
           localStorage.getItem('isAdmin') === 'true' || 
           sessionStorage.getItem('isAdmin') === 'true';
@@ -29,7 +30,7 @@ const AdminAuth = ({ children }: { children: React.ReactNode }) => {
         if (!(adminAuth || Boolean(clerkAuth))) {
           toast({
             title: "Access denied",
-            description: "Please sign in to access the admin panel",
+            description: `Please sign in with email ${adminLoginInfo.email} to access the admin panel`,
             variant: "destructive"
           });
         }
