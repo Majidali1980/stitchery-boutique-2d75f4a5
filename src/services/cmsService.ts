@@ -45,14 +45,15 @@ const transformOrderData = (cmsOrder: CMSOrderData): OrderData => {
     orderDate: cmsOrder.orderDate,
     total: cmsOrder.total,
     status: cmsOrder.status as any,
-    items: cmsOrder.items,
-    shippingAddress: {
-      address: "",
-      city: "",
-      state: "",
-      zipCode: "",
-      country: ""
-    }
+    // Transform items to match the expected OrderItem type
+    items: cmsOrder.items.map(item => ({
+      name: item.productName,
+      price: item.price,
+      quantity: item.quantity,
+      type: 'product' // Default to product type
+    })),
+    // Convert the address object to a string format
+    shippingAddress: "No address provided"
   };
 };
 
@@ -90,15 +91,14 @@ export const useOrders = () => {
             total: 3500,
             status: "pending",
             items: [
-              { productId: "1", productName: "Pink Embroidered Suit", quantity: 1, price: 3500 }
+              { 
+                name: "Pink Embroidered Suit", 
+                quantity: 1, 
+                price: 3500,
+                type: 'product'
+              }
             ],
-            shippingAddress: {
-              address: "123 Main St",
-              city: "Karachi",
-              state: "Sindh",
-              zipCode: "75000",
-              country: "Pakistan"
-            }
+            shippingAddress: "123 Main St, Karachi, Sindh, 75000, Pakistan"
           },
           {
             id: "ORD-1002",
@@ -108,16 +108,20 @@ export const useOrders = () => {
             total: 7200,
             status: "processing",
             items: [
-              { productId: "2", productName: "Red Embellished Suit", quantity: 1, price: 5999 },
-              { productId: "5", productName: "Earrings", quantity: 1, price: 1201 }
+              { 
+                name: "Red Embellished Suit", 
+                quantity: 1, 
+                price: 5999,
+                type: 'product'
+              },
+              { 
+                name: "Earrings", 
+                quantity: 1, 
+                price: 1201,
+                type: 'product'
+              }
             ],
-            shippingAddress: {
-              address: "456 Garden Ave",
-              city: "Lahore",
-              state: "Punjab",
-              zipCode: "54000",
-              country: "Pakistan"
-            }
+            shippingAddress: "456 Garden Ave, Lahore, Punjab, 54000, Pakistan"
           }
         ];
 

@@ -1,10 +1,10 @@
-
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, ShoppingBag, FileText, Image, Ruler, Clock } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { CartItemType } from "@/types/stitching";
+import { OrderItem } from "@/components/admin/orders/utils/orderHelpers";
 
 const OrderConfirmationPage = () => {
   // Generate a random order number
@@ -27,6 +27,34 @@ const OrderConfirmationPage = () => {
       
       // Send order notification to admin panel
       try {
+        // Convert cart items to order items
+        const items: OrderItem[] = location.state.orderItems.map((item: CartItemType) => {
+          if (item.type === 'product') {
+            return {
+              name: item.product.name,
+              price: item.product.price,
+              quantity: item.quantity,
+              type: 'product',
+              selectedSize: item.selectedSize || "Standard",
+              selectedColor: item.selectedColor || "Default"
+            };
+          } else { // stitching
+            return {
+              name: `Custom ${item.service.garmentType.charAt(0).toUpperCase() + item.service.garmentType.slice(1).replace(/-/g, ' ')}`,
+              price: item.service.price,
+              quantity: item.quantity,
+              type: 'stitching',
+              designId: item.service.designId,
+              measurements: item.service.measurements || {},
+              fabric: item.service.fabric || "Not specified",
+              designImage: item.service.designImage || null
+            };
+          }
+        });
+
+        // Format shipping address as a single string
+        const shippingAddress = `${location.state.customerInfo?.address}, ${location.state.customerInfo?.city}, ${location.state.customerInfo?.state}, ${location.state.customerInfo?.zipCode || ""}, ${location.state.customerInfo?.country || "Pakistan"}`;
+        
         const orderData = {
           id: orderNumber,
           customerName: location.state.customerInfo?.firstName + " " + location.state.customerInfo?.lastName || "Customer",
@@ -35,38 +63,8 @@ const OrderConfirmationPage = () => {
           orderDate: orderDate.toISOString(),
           total: location.state.totalAmount || 0,
           status: "pending",
-          items: location.state.orderItems.map((item: CartItemType) => {
-            const baseItem = {
-              name: item.type === 'product' ? item.product.name : 
-                `Custom ${item.service.garmentType.charAt(0).toUpperCase() + item.service.garmentType.slice(1).replace(/-/g, ' ')}`,
-              price: item.type === 'product' ? item.product.price : item.service.price,
-              quantity: item.quantity,
-              type: item.type
-            };
-            
-            // Add stitching-specific details
-            if (item.type === 'stitching') {
-              return {
-                ...baseItem,
-                designId: item.service.designId,
-                measurements: item.service.measurements || {},
-                fabric: item.service.fabric || "Not specified",
-                designImage: item.service.designImage || null
-              };
-            }
-            
-            // Add product-specific details
-            if (item.type === 'product') {
-              return {
-                ...baseItem,
-                selectedSize: item.selectedSize || "Standard",
-                selectedColor: item.selectedColor || "Default"
-              };
-            }
-            
-            return baseItem;
-          }),
-          shippingAddress: `${location.state.customerInfo?.address}, ${location.state.customerInfo?.city}, ${location.state.customerInfo?.state}, ${location.state.customerInfo?.zip || ""}`
+          items: items,
+          shippingAddress: shippingAddress
         };
         
         // Send order to admin panel with a slight delay to ensure it's properly received

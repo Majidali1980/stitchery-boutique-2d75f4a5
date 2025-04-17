@@ -10,17 +10,17 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown, Calendar, Eye } from "lucide-react";
-import { getFormattedDate } from "./utils/orderHelpers";
+import { getFormattedDate, OrderData } from "./utils/orderHelpers";
 
 type OrderStatus = "pending" | "processing" | "shipped" | "delivered" | "cancelled";
 type SortField = "id" | "customerName" | "orderDate" | "total" | "status";
 
 interface OrdersTableProps {
-  orders: any[];
+  orders: OrderData[];
   sortField: SortField;
   sortDirection: "asc" | "desc";
   handleSort: (field: SortField) => void;
-  handleViewOrder: (order: any) => void;
+  handleViewOrder: (order: OrderData) => void;
 }
 
 const OrdersTable = ({ 
@@ -108,7 +108,7 @@ const OrdersTable = ({
                 <TableCell className="font-medium">{order.id}</TableCell>
                 <TableCell>
                   <div>{order.customerName}</div>
-                  <div className="text-sm text-muted-foreground">{order.customerPhone}</div>
+                  <div className="text-sm text-muted-foreground">{order.customerPhone || order.customerEmail}</div>
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center">

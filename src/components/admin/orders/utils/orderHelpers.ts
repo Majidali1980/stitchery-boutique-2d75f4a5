@@ -18,13 +18,13 @@ export interface OrderItem {
 export interface OrderData {
   id: string;
   customerName: string;
-  customerPhone: string;
   customerEmail: string;
   orderDate: string;
   total: number;
   status: OrderStatus;
   items: OrderItem[];
   shippingAddress: string;
+  customerPhone?: string;
 }
 
 export const filterOrders = (
@@ -37,7 +37,7 @@ export const filterOrders = (
       order.customerName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       order.id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       order.customerEmail?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.customerPhone?.toLowerCase().includes(searchTerm.toLowerCase())
+      (order.customerPhone && order.customerPhone?.toLowerCase().includes(searchTerm.toLowerCase()))
     )
     .filter(order => statusFilter === "all" || order.status === statusFilter);
 };
