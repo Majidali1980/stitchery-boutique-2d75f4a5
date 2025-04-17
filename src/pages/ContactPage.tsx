@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import { Mail, Phone, MapPin, MessageCircle } from 'lucide-react';
 import emailjs from '@emailjs/browser';
+import { Card, CardContent } from "@/components/ui/card";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
@@ -82,7 +83,7 @@ const ContactPage = () => {
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
         <div>
-          <div className="bg-gray-50 dark:bg-gray-800 p-8 rounded-lg">
+          <div className="bg-gray-50 dark:bg-gray-800 p-8 rounded-lg mb-6">
             <h2 className="text-2xl font-bold mb-6">Get In Touch</h2>
             
             <div className="space-y-6">
@@ -129,6 +130,17 @@ const ContactPage = () => {
               </div>
             </div>
           </div>
+          
+          {/* Added new card with the provided image */}
+          <Card className="overflow-hidden">
+            <CardContent className="p-0">
+              <img 
+                src="https://github.com/Majidali1980/lmages/blob/main/TAYABA%20MAJID%20(940%20x%20788%20px).png?raw=true"
+                alt="Tayaba Majid" 
+                className="w-full h-auto object-cover"
+              />
+            </CardContent>
+          </Card>
         </div>
         
         <div>

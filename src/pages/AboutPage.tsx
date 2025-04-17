@@ -49,7 +49,7 @@ const AboutPage = () => {
             <div className="md:w-1/2">
               <div className="relative">
                 <img 
-                  src="/lovable-uploads/374a46ac-8e48-4ca7-8196-229e51804eed.png" 
+                  src="https://github.com/Majidali1980/lmages/blob/main/girl3.jpeg?raw=true" 
                   alt="Our Story" 
                   className="rounded-lg object-cover w-full h-[400px]"
                 />

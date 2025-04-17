@@ -32,6 +32,7 @@ import SignInPage from "@/pages/auth/SignInPage";
 import SignUpPage from "@/pages/auth/SignUpPage";
 import OrderConfirmationPage from "@/pages/OrderConfirmationPage";
 import AdminCustomersPage from "@/pages/admin/AdminCustomersPage";
+import RateList from "@/components/RateList";
 
 // Try to load Stripe key safely
 const stripePromise = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY 
@@ -60,6 +61,9 @@ function App() {
         <WishlistProvider>
           <div className="flex flex-col min-h-screen">
             <SiteHeader />
+            <div className="bg-gray-100 py-2 px-4 text-center">
+              <RateList />
+            </div>
             <main className="flex-grow">
               <Elements stripe={stripePromise}>
                 <Routes>

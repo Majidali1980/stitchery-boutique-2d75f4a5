@@ -40,7 +40,7 @@ const AdminSidebar = () => {
       <div 
         className={cn(
           "flex items-center justify-between p-3 rounded-md cursor-pointer",
-          isActive ? "bg-brand-gold text-white" : "hover:bg-gray-100"
+          isActive ? "bg-brand-gold text-white" : "hover:bg-gray-100 text-gray-800"
         )}
         onClick={onClick}
       >
