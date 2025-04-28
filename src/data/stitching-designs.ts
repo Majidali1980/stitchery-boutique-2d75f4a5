@@ -1,4 +1,3 @@
-
 import { CustomDesign } from "@/types/stitching";
 
 // Suit designs
@@ -44,8 +43,7 @@ export const suitDesigns: CustomDesign[] = [
     description: "Perfect for special occasions and celebrations",
     price: 22000,
     designCode: "SR-004"
-  },
-  // More existing suit designs kept
+  }
 ];
 
 // Shirt designs
@@ -59,7 +57,13 @@ export const shirtDesigns: CustomDesign[] = [
     description: "Traditional collar design with premium stitching",
     price: 4500,
     designCode: "SC-001",
-    features: ["Classic collar", "Premium stitching", "Business casual"]
+    features: [
+      "Classic collar design",
+      "Premium cotton fabric",
+      "Perfect for formal occasions",
+      "Custom measurements",
+      "Expert tailoring"
+    ]
   },
   {
     id: "shirt-2",
@@ -69,9 +73,15 @@ export const shirtDesigns: CustomDesign[] = [
     imageUrl: "https://github.com/Majidali1980/lmages/blob/main/1%20(6).jpeg?raw=true",
     description: "Contemporary cut with clean lines",
     price: 5000,
-    designCode: "SC-002"
-  },
-  // More existing shirt designs kept
+    designCode: "SC-002",
+    features: [
+      "Modern slim fit",
+      "Premium fabric selection",
+      "Contemporary styling",
+      "Custom measurements",
+      "Perfect for any occasion"
+    ]
+  }
 ];
 
 // New trouser designs

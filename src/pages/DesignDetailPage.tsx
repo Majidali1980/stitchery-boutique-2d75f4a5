@@ -21,7 +21,6 @@ const DesignDetailPage = () => {
   const [reviews, setReviews] = useState<Array<{name: string; comment: string; rating: number; date: string}>>([]);
 
   useEffect(() => {
-    // Find design across all design types
     const allDesigns = [...suitDesigns, ...shirtDesigns, ...trouserDesigns, ...kameezShalwarDesigns];
     const foundDesign = allDesigns.find(d => d.id === id);
     
@@ -41,7 +40,6 @@ const DesignDetailPage = () => {
     
     if (!design) return;
     
-    // Navigate to custom stitching page with design parameters
     navigate(`/custom-stitching?designId=${design.id}&type=${design.type}`);
   };
 
@@ -95,7 +93,6 @@ const DesignDetailPage = () => {
   return (
     <div className="container py-16 max-w-7xl mx-auto">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-        {/* Design Image */}
         <div>
           <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 h-full">
             <img 
@@ -106,7 +103,6 @@ const DesignDetailPage = () => {
           </div>
         </div>
 
-        {/* Design Details */}
         <div>
           <div className="flex items-center">
             <Link 
@@ -141,7 +137,6 @@ const DesignDetailPage = () => {
 
           <Separator className="my-6" />
 
-          {/* Features */}
           <div>
             <h3 className="font-medium text-lg mb-3">Features</h3>
             <ul className="space-y-2">
@@ -197,11 +192,9 @@ const DesignDetailPage = () => {
         </div>
       </div>
 
-      {/* Review Section */}
       <div className="mt-16">
         <h2 className="text-2xl font-semibold mb-6">Customer Reviews</h2>
         
-        {/* Submit Review Form */}
         <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg mb-8">
           <h3 className="text-lg font-medium mb-4">Write a Review</h3>
           <form onSubmit={handleSubmitReview}>
@@ -251,7 +244,6 @@ const DesignDetailPage = () => {
           </form>
         </div>
 
-        {/* Display Reviews */}
         <div className="space-y-6">
           {reviews.length > 0 ? (
             reviews.map((review, index) => (
