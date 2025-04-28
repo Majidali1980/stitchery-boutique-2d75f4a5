@@ -12,7 +12,7 @@ const ActionButtons = () => {
           Continue Shopping
         </Link>
       </Button>
-      <Button asChild className="bg-brand-gold hover:bg-brand-gold/90" size="lg" className="gap-2">
+      <Button asChild size="lg" className="gap-2 bg-brand-gold hover:bg-brand-gold/90">
         <Link to="/">
           <Home size={18} />
           Back to Home
@@ -23,3 +23,4 @@ const ActionButtons = () => {
 };
 
 export default ActionButtons;
+
