@@ -2,6 +2,7 @@
 import { Outlet } from "react-router-dom";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import { WhatsAppButton, SocialSharePopup } from "@/components/SocialButtons";
 
 const MainLayout = () => {
   return (
@@ -11,6 +12,8 @@ const MainLayout = () => {
         <Outlet />
       </main>
       <Footer />
+      <WhatsAppButton />
+      <SocialSharePopup />
     </div>
   );
 };

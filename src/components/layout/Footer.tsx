@@ -1,8 +1,8 @@
 
 import { Link } from "react-router-dom";
-import { 
-  Phone, MapPin, Facebook, Instagram, MessageCircle
-} from "lucide-react";
+import { Phone, MapPin, Facebook, Instagram, MessageCircle } from "lucide-react";
+import { SocialFollowPopup } from "@/components/SocialButtons";
+import { DialogTrigger } from "@/components/ui/dialog";
 
 const Footer = () => {
   return (
@@ -20,22 +20,26 @@ const Footer = () => {
               Expert in all types of stitching for ladies' and girls' suits. Custom stitching and ready-to-wear options available.
             </p>
             <div className="flex space-x-4 mt-4">
-              <a 
-                href="https://www.facebook.com/profile.php?id=100067160730050" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="text-gray-300 hover:text-brand-gold"
-              >
-                <Facebook size={20} />
-              </a>
-              <a 
-                href="https://www.instagram.com/mafabrics2024?igsh=a2hoM2VoMnZ1NGt6" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="text-gray-300 hover:text-brand-gold"
-              >
-                <Instagram size={20} />
-              </a>
+              <DialogTrigger asChild>
+                <div className="space-x-4">
+                  <a 
+                    href="https://www.facebook.com/profile.php?id=100067160730050" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="text-gray-300 hover:text-brand-gold"
+                  >
+                    <Facebook size={20} />
+                  </a>
+                  <a 
+                    href="https://www.instagram.com/matailor1994/" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="text-gray-300 hover:text-brand-gold"
+                  >
+                    <Instagram size={20} />
+                  </a>
+                </div>
+              </DialogTrigger>
             </div>
           </div>
           
@@ -135,6 +139,7 @@ const Footer = () => {
           </div>
         </div>
       </div>
+      <SocialFollowPopup />
     </footer>
   );
 };

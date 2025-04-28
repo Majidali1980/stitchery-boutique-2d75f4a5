@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,9 +7,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
-import { Mail, Phone, MapPin, MessageCircle } from 'lucide-react';
+import { Mail, Phone, MapPin, MessageCircle, Facebook, Instagram } from 'lucide-react';
 import emailjs from '@emailjs/browser';
 import { Card, CardContent } from "@/components/ui/card";
+import { SocialFollowPopup } from "@/components/SocialButtons";
+import { DialogTrigger } from "@/components/ui/dialog";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
@@ -116,6 +117,37 @@ const ContactPage = () => {
                   </p>
                 </div>
               </div>
+
+              <div className="flex items-start">
+                <div className="bg-brand-gold rounded-full p-3 mr-4">
+                  <Mail className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-lg">Social Media</h3>
+                  <div className="flex space-x-4 mt-2">
+                    <DialogTrigger asChild>
+                      <div className="space-x-4">
+                        <a 
+                          href="https://www.facebook.com/profile.php?id=100067160730050"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:text-blue-700"
+                        >
+                          <Facebook className="h-6 w-6" />
+                        </a>
+                        <a 
+                          href="https://www.instagram.com/matailor1994/"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-pink-600 hover:text-pink-700"
+                        >
+                          <Instagram className="h-6 w-6" />
+                        </a>
+                      </div>
+                    </DialogTrigger>
+                  </div>
+                </div>
+              </div>
             </div>
             
             <div className="mt-8">
@@ -131,7 +163,6 @@ const ContactPage = () => {
             </div>
           </div>
           
-          {/* Added new card with the provided image */}
           <Card className="overflow-hidden">
             <CardContent className="p-0">
               <img 
@@ -242,6 +273,7 @@ const ContactPage = () => {
           </div>
         </div>
       </div>
+      <SocialFollowPopup />
     </div>
   );
 };
