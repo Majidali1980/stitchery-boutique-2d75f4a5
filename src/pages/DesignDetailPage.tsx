@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { CustomDesign } from "@/types/stitching";
@@ -42,17 +41,8 @@ const DesignDetailPage = () => {
     
     if (!design) return;
     
-    // Store selected design in sessionStorage to retrieve it on the custom stitching page
-    sessionStorage.setItem('selectedDesign', JSON.stringify({
-      id: design.id,
-      name: design.name,
-      type: design.type,
-      imageUrl: design.imageUrl,
-      designCode: design.designCode || design.id
-    }));
-    
-    // Navigate to custom stitching page
-    navigate("/custom-stitching");
+    // Navigate to custom stitching page with design parameters
+    navigate(`/custom-stitching?designId=${design.id}&type=${design.type}`);
   };
 
   const handleSubmitReview = (e: React.FormEvent) => {
