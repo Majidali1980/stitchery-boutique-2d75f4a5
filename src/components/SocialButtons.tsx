@@ -71,6 +71,9 @@ export const SocialSharePopup = () => {
 export const SocialFollowPopup = () => {
   return (
     <Dialog>
+      <DialogTrigger asChild>
+        <span className="hidden">Follow Us</span>
+      </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <div className="space-y-4 py-4">
           <a 

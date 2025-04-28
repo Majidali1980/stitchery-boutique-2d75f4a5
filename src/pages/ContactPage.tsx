@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,8 +11,8 @@ import { toast } from "@/components/ui/use-toast";
 import { Mail, Phone, MapPin, MessageCircle, Facebook, Instagram } from 'lucide-react';
 import emailjs from '@emailjs/browser';
 import { Card, CardContent } from "@/components/ui/card";
+import { Dialog } from "@/components/ui/dialog";
 import { SocialFollowPopup } from "@/components/SocialButtons";
-import { DialogTrigger } from "@/components/ui/dialog";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
@@ -125,7 +126,7 @@ const ContactPage = () => {
                 <div>
                   <h3 className="font-semibold text-lg">Social Media</h3>
                   <div className="flex space-x-4 mt-2">
-                    <DialogTrigger asChild>
+                    <Dialog>
                       <div className="space-x-4">
                         <a 
                           href="https://www.facebook.com/profile.php?id=100067160730050"
@@ -144,7 +145,7 @@ const ContactPage = () => {
                           <Instagram className="h-6 w-6" />
                         </a>
                       </div>
-                    </DialogTrigger>
+                    </Dialog>
                   </div>
                 </div>
               </div>
