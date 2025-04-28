@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useLocation, Navigate } from "react-router-dom";
 import { CartItemType } from "@/types/stitching";
 import { useCart } from "@/context/CartContext";
@@ -9,6 +9,7 @@ import OrderSummary from "@/components/order-confirmation/OrderSummary";
 import OrderItemsList from "@/components/order-confirmation/OrderItemsList";
 import OrderStatusInfo from "@/components/order-confirmation/OrderStatusInfo";
 import ActionButtons from "@/components/order-confirmation/ActionButtons";
+import PDFDownloadButton from "@/components/order-confirmation/PDFDownloadButton";
 import { toast } from "@/components/ui/use-toast";
 
 const OrderConfirmationPage = () => {
@@ -16,7 +17,10 @@ const OrderConfirmationPage = () => {
   const [orderItems, setOrderItems] = useState<CartItemType[]>([]);
   const [orderNumber, setOrderNumber] = useState("");
   const [orderDate] = useState(new Date());
+  const [customerInfo, setCustomerInfo] = useState<any>(null);
+  const [totalAmount, setTotalAmount] = useState(0);
   const { clearCart } = useCart();
+  const pdfRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
     // Scroll to top when component mounts
@@ -30,6 +34,16 @@ const OrderConfirmationPage = () => {
     
     // Set order items from state
     setOrderItems(location.state.orderItems);
+    
+    // Save customer info
+    if (location.state.customerInfo) {
+      setCustomerInfo(location.state.customerInfo);
+    }
+    
+    // Set total amount
+    if (location.state.totalAmount) {
+      setTotalAmount(location.state.totalAmount);
+    }
     
     // Generate stable order number from timestamp if not already present
     if (location.state.orderNumber) {
@@ -106,18 +120,59 @@ const OrderConfirmationPage = () => {
   }
   
   return (
-    <div className="container py-16 max-w-3xl mx-auto">
-      <OrderHeader />
-      
-      <div className="bg-white rounded-lg border p-6 mb-8 text-left">
-        <OrderSummary orderNumber={orderNumber} orderDate={orderDate} />
+    <div className="container py-16 mx-auto">
+      <div className="max-w-4xl mx-auto">
+        <div className="flex justify-end mb-4">
+          <PDFDownloadButton targetRef={pdfRef} fileName={`Order-${orderNumber}.pdf`} />
+        </div>
         
-        <h2 className="font-semibold text-lg mb-3">Order Details</h2>
-        <OrderItemsList orderItems={orderItems} />
-        <OrderStatusInfo />
+        <div ref={pdfRef} className="bg-white p-6 rounded-lg border">
+          <OrderHeader />
+          
+          <div className="bg-white rounded-lg p-6 mb-8 text-left">
+            <OrderSummary orderNumber={orderNumber} orderDate={orderDate} />
+            
+            {customerInfo && (
+              <div className="mb-6 mt-4">
+                <h2 className="font-semibold text-lg mb-3">Customer Information</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-md">
+                  <div>
+                    <p className="text-sm text-gray-500">Name</p>
+                    <p className="font-medium">{customerInfo.firstName} {customerInfo.lastName}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Email</p>
+                    <p className="font-medium">{customerInfo.email}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Phone</p>
+                    <p className="font-medium">{customerInfo.phone}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Address</p>
+                    <p className="font-medium">
+                      {customerInfo.address}, {customerInfo.city}, {customerInfo.state}, {customerInfo.zipCode}, {customerInfo.country || "Pakistan"}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            <h2 className="font-semibold text-lg mb-3">Order Details</h2>
+            <OrderItemsList orderItems={orderItems} />
+            
+            <div className="mt-6 text-right">
+              <p className="text-lg font-semibold">Total Amount: <span className="text-brand-gold">Rs. {totalAmount.toLocaleString()}</span></p>
+            </div>
+            
+            <OrderStatusInfo />
+          </div>
+        </div>
+        
+        <div className="mt-8">
+          <ActionButtons />
+        </div>
       </div>
-      
-      <ActionButtons />
     </div>
   );
 };
