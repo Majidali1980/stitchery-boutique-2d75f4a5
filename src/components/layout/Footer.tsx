@@ -1,6 +1,6 @@
 
 import { Link } from "react-router-dom";
-import { Phone, MapPin, Facebook, Instagram, MessageCircle } from "lucide-react";
+import { MapPin, Facebook, Instagram, MessageCircle, Globe } from "lucide-react";
 import { Dialog } from "@/components/ui/dialog";
 import { SocialFollowPopup } from "@/components/SocialButtons";
 
@@ -132,10 +132,37 @@ const Footer = () => {
           <p className="text-sm text-gray-400">
             &copy; {new Date().getFullYear()} MA Tailor. All rights reserved.
           </p>
-          <div className="mt-4 md:mt-0">
+          <div className="mt-4 md:mt-0 flex flex-col items-center md:items-end">
             <p className="text-xs text-gray-400">
-              Designed & Developed with ❤️
+              Designed & Developed with ❤️ by 
+              <a 
+                href="https://www.facebook.com/share/16TyxwjKRy/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-brand-gold hover:text-brand-gold/80 ml-1"
+              >
+                MA DIGITAL HUB
+              </a>
             </p>
+            <div className="flex items-center space-x-2 mt-2">
+              <a 
+                href="https://www.facebook.com/share/16TyxwjKRy/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-xs text-gray-400 hover:text-brand-gold"
+              >
+                <Facebook size={14} />
+              </a>
+              <a 
+                href="https://www.fiverr.com/users/alimajid0302198" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-xs text-gray-400 hover:text-brand-gold flex items-center"
+              >
+                <Globe size={14} />
+                <span className="ml-1">Fiverr</span>
+              </a>
+            </div>
           </div>
         </div>
       </div>

@@ -1,5 +1,5 @@
 
-import { Facebook, Instagram, Share2 } from "lucide-react";
+import { Facebook, Instagram, Share2, Globe } from "lucide-react";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
@@ -94,6 +94,31 @@ export const SocialFollowPopup = () => {
             <Instagram className="h-5 w-5" />
             Follow us on Instagram
           </a>
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
+            <p className="text-center text-sm text-gray-500 dark:text-gray-400 mb-3">
+              Developed by
+            </p>
+            <div className="flex justify-center gap-4">
+              <a 
+                href="https://www.facebook.com/share/16TyxwjKRy/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col items-center text-sm text-gray-600 hover:text-blue-600"
+              >
+                <Facebook className="h-6 w-6 mb-1" />
+                <span>MA DIGITAL HUB</span>
+              </a>
+              <a 
+                href="https://www.fiverr.com/users/alimajid0302198"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col items-center text-sm text-gray-600 hover:text-green-600"
+              >
+                <Globe className="h-6 w-6 mb-1" />
+                <span>Fiverr</span>
+              </a>
+            </div>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

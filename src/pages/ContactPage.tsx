@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
-import { Mail, Phone, MapPin, MessageCircle, Facebook, Instagram } from 'lucide-react';
+import { Mail, Phone, MapPin, MessageCircle, Facebook, Instagram, Globe } from 'lucide-react';
 import emailjs from '@emailjs/browser';
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog } from "@/components/ui/dialog";
@@ -160,6 +160,30 @@ const ContactPage = () => {
                 <div>10:00 AM - 4:00 PM</div>
                 <div>Sunday</div>
                 <div>Closed</div>
+              </div>
+            </div>
+            
+            <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+              <h3 className="font-semibold text-lg mb-2">Developed By</h3>
+              <div className="flex gap-4">
+                <a 
+                  href="https://www.facebook.com/share/16TyxwjKRy/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center text-gray-600 hover:text-blue-600"
+                >
+                  <Facebook className="h-5 w-5 mr-1" />
+                  <span>MA DIGITAL HUB</span>
+                </a>
+                <a 
+                  href="https://www.fiverr.com/users/alimajid0302198"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center text-gray-600 hover:text-green-600"
+                >
+                  <Globe className="h-5 w-5 mr-1" />
+                  <span>Fiverr</span>
+                </a>
               </div>
             </div>
           </div>

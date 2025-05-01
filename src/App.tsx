@@ -33,6 +33,8 @@ import SignUpPage from "@/pages/auth/SignUpPage";
 import OrderConfirmationPage from "@/pages/OrderConfirmationPage";
 import AdminCustomersPage from "@/pages/admin/AdminCustomersPage";
 import RateList from "@/components/RateList";
+import MainLayout from "@/layouts/MainLayout";
+import { WhatsAppButton, SocialSharePopup } from "@/components/SocialButtons";
 
 // Try to load Stripe key safely
 const stripePromise = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY 
@@ -67,23 +69,25 @@ function App() {
             <main className="flex-grow">
               <Elements stripe={stripePromise}>
                 <Routes>
-                  <Route path="/" element={<HomePage />} />
-                  <Route path="/products" element={<ProductsPage />} />
-                  <Route path="/products/:productId" element={<ProductDetailPage />} />
-                  <Route path="/cart" element={<CartPage />} />
-                  <Route path="/wishlist" element={<WishlistPage />} />
+                  <Route element={<MainLayout />}>
+                    <Route path="/" element={<HomePage />} />
+                    <Route path="/products" element={<ProductsPage />} />
+                    <Route path="/products/:productId" element={<ProductDetailPage />} />
+                    <Route path="/cart" element={<CartPage />} />
+                    <Route path="/wishlist" element={<WishlistPage />} />
+                    <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
+                    <Route path="/contact" element={<ContactPage />} />
+                    <Route path="/about" element={<AboutPage />} />
+                    <Route path="/custom-stitching" element={<CustomStitchingPage />} />
+                    <Route path="/stitching-designs" element={<StitchingDesignsPage />} />
+                    <Route path="/custom-stitching/design/:id" element={<DesignDetailPage />} />
+                    <Route path="/size-chart" element={<SizeChartPage />} />
+                    <Route path="/sign-in" element={<SignInPage />} />
+                    <Route path="/sign-up" element={<SignUpPage />} />
+                  </Route>
+
+                  {/* Checkout has no footer */}
                   <Route path="/checkout" element={<CheckoutPage />} />
-                  <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
-                  <Route path="/contact" element={<ContactPage />} />
-                  <Route path="/about" element={<AboutPage />} />
-                  <Route path="/custom-stitching" element={<CustomStitchingPage />} />
-                  <Route path="/stitching-designs" element={<StitchingDesignsPage />} />
-                  <Route path="/custom-stitching/design/:id" element={<DesignDetailPage />} />
-                  <Route path="/size-chart" element={<SizeChartPage />} />
-                  
-                  {/* Auth Routes */}
-                  <Route path="/sign-in" element={<SignInPage />} />
-                  <Route path="/sign-up" element={<SignUpPage />} />
                   
                   {/* Admin Routes */}
                   <Route path="/admin-login" element={<AdminLoginPage />} />
@@ -102,7 +106,13 @@ function App() {
                 </Routes>
               </Elements>
             </main>
-            {isFooterVisible && <SiteFooter />}
+            {/* Footer is now handled in MainLayout for most routes */}
+            {!isFooterVisible && location.pathname !== '/checkout' && (
+              <>
+                <WhatsAppButton />
+                <SocialSharePopup />
+              </>
+            )}
             <Toaster />
           </div>
         </WishlistProvider>
