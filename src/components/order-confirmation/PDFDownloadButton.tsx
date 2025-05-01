@@ -1,8 +1,8 @@
 
-import React, { useRef } from "react";
+import React from "react";
 import { Button } from "@/components/ui/button";
-import { useReactToPdf } from "react-to-pdf";
-import { FilePdf } from "lucide-react";
+import { generatePdf } from "react-to-pdf";
+import { FileText } from "lucide-react";
 
 interface PDFDownloadButtonProps {
   targetRef: React.RefObject<HTMLDivElement>;
@@ -10,21 +10,24 @@ interface PDFDownloadButtonProps {
 }
 
 const PDFDownloadButton = ({ targetRef, fileName }: PDFDownloadButtonProps) => {
-  const { toPdf, targetRef: pdfTargetRef } = useReactToPdf({
-    filename: fileName,
-    options: {
-      format: [210, 297], // A4 size in mm
-      margin: 10,
-    },
-  });
+  const handleDownload = () => {
+    generatePdf({
+      filename: fileName,
+      page: {
+        format: 'A4',
+        margin: 10
+      },
+      element: targetRef.current
+    });
+  };
 
   return (
     <Button 
-      onClick={() => toPdf()}
+      onClick={handleDownload}
       variant="outline" 
       className="gap-2 border-brand-gold text-brand-gold hover:bg-brand-gold hover:text-white"
     >
-      <FilePdf size={18} />
+      <FileText size={18} />
       Download Order PDF
     </Button>
   );
