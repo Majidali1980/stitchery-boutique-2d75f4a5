@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import ReactToPdf from "react-to-pdf";
+import { usePDF } from "react-to-pdf";
 import { FileText } from "lucide-react";
 
 interface PDFDownloadButtonProps {
@@ -10,22 +10,17 @@ interface PDFDownloadButtonProps {
 }
 
 const PDFDownloadButton = ({ targetRef, fileName }: PDFDownloadButtonProps) => {
-  const handleDownload = () => {
-    if (targetRef.current) {
-      ReactToPdf({
-        filename: fileName,
-        page: {
-          format: 'A4',
-          margin: 10
-        },
-        element: targetRef.current
-      });
+  const { toPDF, targetRef: pdfTargetRef } = usePDF({
+    filename: fileName,
+    page: { 
+      format: 'A4',
+      margin: 10 
     }
-  };
+  });
 
   return (
     <Button 
-      onClick={handleDownload}
+      onClick={() => toPDF()}
       variant="outline" 
       className="gap-2 border-brand-gold text-brand-gold hover:bg-brand-gold hover:text-white"
     >
