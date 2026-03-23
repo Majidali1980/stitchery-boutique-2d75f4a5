@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { CustomDesign } from "@/types/stitching";
@@ -6,7 +7,6 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { suitDesigns, shirtDesigns, trouserDesigns, kameezShalwarDesigns } from "@/data/stitching-designs";
 import { Check, Ruler, Shirt, Star } from "lucide-react";
-import { useAuth } from "@clerk/clerk-react";
 import { toast } from "@/components/ui/use-toast";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -16,30 +16,18 @@ const DesignDetailPage = () => {
   const [design, setDesign] = useState<CustomDesign | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const { isSignedIn } = useAuth();
   const [userReview, setUserReview] = useState({ name: "", comment: "", rating: 5 });
   const [reviews, setReviews] = useState<Array<{name: string; comment: string; rating: number; date: string}>>([]);
 
   useEffect(() => {
     const allDesigns = [...suitDesigns, ...shirtDesigns, ...trouserDesigns, ...kameezShalwarDesigns];
     const foundDesign = allDesigns.find(d => d.id === id);
-    
     setDesign(foundDesign || null);
     setLoading(false);
   }, [id]);
 
   const handleCustomStitching = () => {
-    if (!isSignedIn) {
-      toast({
-        title: "Authentication required",
-        description: "Please sign in to proceed with custom stitching.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
     if (!design) return;
-    
     navigate(`/custom-stitching?designId=${design.id}&type=${design.type}`);
   };
 
@@ -54,18 +42,10 @@ const DesignDetailPage = () => {
       return;
     }
 
-    const newReview = {
-      ...userReview,
-      date: new Date().toISOString()
-    };
-
+    const newReview = { ...userReview, date: new Date().toISOString() };
     setReviews(prev => [newReview, ...prev]);
     setUserReview({ name: "", comment: "", rating: 5 });
-
-    toast({
-      title: "Review submitted",
-      description: "Thank you for your feedback!"
-    });
+    toast({ title: "Review submitted", description: "Thank you for your feedback!" });
   };
 
   if (loading) {
@@ -105,17 +85,11 @@ const DesignDetailPage = () => {
 
         <div>
           <div className="flex items-center">
-            <Link 
-              to={`/stitching-designs`}
-              className="text-sm text-gray-500 hover:text-brand-gold dark:text-gray-400 dark:hover:text-brand-gold"
-            >
+            <Link to="/stitching-designs" className="text-sm text-gray-500 hover:text-brand-gold dark:text-gray-400 dark:hover:text-brand-gold">
               Stitching Designs
             </Link>
             <span className="mx-2">›</span>
-            <Link 
-              to={`/custom-stitching/${design.type}-designs`}
-              className="text-sm text-gray-500 hover:text-brand-gold dark:text-gray-400 dark:hover:text-brand-gold"
-            >
+            <Link to={`/custom-stitching/${design.type}-designs`} className="text-sm text-gray-500 hover:text-brand-gold dark:text-gray-400 dark:hover:text-brand-gold">
               {design.type.charAt(0).toUpperCase() + design.type.slice(1)} Designs
             </Link>
           </div>
@@ -149,44 +123,24 @@ const DesignDetailPage = () => {
                 ))
               ) : (
                 <>
-                  <li className="flex items-center">
-                    <Check className="h-5 w-5 text-brand-gold mr-2" />
-                    <span>Premium quality fabric</span>
-                  </li>
-                  <li className="flex items-center">
-                    <Check className="h-5 w-5 text-brand-gold mr-2" />
-                    <span>Custom tailoring to your measurements</span>
-                  </li>
-                  <li className="flex items-center">
-                    <Check className="h-5 w-5 text-brand-gold mr-2" />
-                    <span>Perfect fit guarantee</span>
-                  </li>
+                  <li className="flex items-center"><Check className="h-5 w-5 text-brand-gold mr-2" /><span>Premium quality fabric</span></li>
+                  <li className="flex items-center"><Check className="h-5 w-5 text-brand-gold mr-2" /><span>Custom tailoring to your measurements</span></li>
+                  <li className="flex items-center"><Check className="h-5 w-5 text-brand-gold mr-2" /><span>Perfect fit guarantee</span></li>
                 </>
               )}
             </ul>
           </div>
 
-          <Button 
-            onClick={handleCustomStitching}
-            className="w-full mt-8 bg-brand-gold hover:bg-brand-gold/90 text-white"
-          >
+          <Button onClick={handleCustomStitching} className="w-full mt-8 bg-brand-gold hover:bg-brand-gold/90 text-white">
             Get This Design Custom Stitched
           </Button>
 
           <div className="mt-6 flex items-center space-x-4">
-            <Link 
-              to="/size-chart" 
-              className="text-sm flex items-center text-gray-600 hover:text-brand-gold dark:text-gray-300"
-            >
-              <Ruler className="h-4 w-4 mr-1" />
-              <span>Size Chart</span>
+            <Link to="/size-chart" className="text-sm flex items-center text-gray-600 hover:text-brand-gold dark:text-gray-300">
+              <Ruler className="h-4 w-4 mr-1" /><span>Size Chart</span>
             </Link>
-            <Link 
-              to="/custom-stitching" 
-              className="text-sm flex items-center text-gray-600 hover:text-brand-gold dark:text-gray-300"
-            >
-              <Shirt className="h-4 w-4 mr-1" />
-              <span>Custom Measurements</span>
+            <Link to="/custom-stitching" className="text-sm flex items-center text-gray-600 hover:text-brand-gold dark:text-gray-300">
+              <Shirt className="h-4 w-4 mr-1" /><span>Custom Measurements</span>
             </Link>
           </div>
         </div>
@@ -201,27 +155,14 @@ const DesignDetailPage = () => {
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium mb-1">Your Name</label>
-                <Input 
-                  id="name" 
-                  value={userReview.name}
-                  onChange={(e) => setUserReview({...userReview, name: e.target.value})}
-                  placeholder="Enter your name"
-                  className="w-full"
-                />
+                <Input id="name" value={userReview.name} onChange={(e) => setUserReview({...userReview, name: e.target.value})} placeholder="Enter your name" className="w-full" />
               </div>
               <div>
                 <label htmlFor="rating" className="block text-sm font-medium mb-1">Rating</label>
                 <div className="flex items-center">
                   {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      type="button"
-                      onClick={() => setUserReview({...userReview, rating: star})}
-                      className="focus:outline-none"
-                    >
-                      <Star 
-                        className={`h-6 w-6 ${star <= userReview.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} 
-                      />
+                    <button key={star} type="button" onClick={() => setUserReview({...userReview, rating: star})} className="focus:outline-none">
+                      <Star className={`h-6 w-6 ${star <= userReview.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} />
                     </button>
                   ))}
                 </div>
@@ -229,18 +170,9 @@ const DesignDetailPage = () => {
             </div>
             <div className="mt-4">
               <label htmlFor="comment" className="block text-sm font-medium mb-1">Your Review</label>
-              <Textarea 
-                id="comment" 
-                value={userReview.comment}
-                onChange={(e) => setUserReview({...userReview, comment: e.target.value})}
-                placeholder="Share your thoughts about this design"
-                className="w-full"
-                rows={4}
-              />
+              <Textarea id="comment" value={userReview.comment} onChange={(e) => setUserReview({...userReview, comment: e.target.value})} placeholder="Share your thoughts about this design" className="w-full" rows={4} />
             </div>
-            <Button type="submit" className="mt-4 bg-brand-gold hover:bg-brand-gold/90 text-white">
-              Submit Review
-            </Button>
+            <Button type="submit" className="mt-4 bg-brand-gold hover:bg-brand-gold/90 text-white">Submit Review</Button>
           </form>
         </div>
 
@@ -253,16 +185,11 @@ const DesignDetailPage = () => {
                     <h4 className="font-medium">{review.name}</h4>
                     <div className="flex items-center mt-1">
                       {[...Array(5)].map((_, i) => (
-                        <Star 
-                          key={i}
-                          className={`h-4 w-4 ${i < review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} 
-                        />
+                        <Star key={i} className={`h-4 w-4 ${i < review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} />
                       ))}
                     </div>
                   </div>
-                  <span className="text-sm text-gray-500">
-                    {new Date(review.date).toLocaleDateString()}
-                  </span>
+                  <span className="text-sm text-gray-500">{new Date(review.date).toLocaleDateString()}</span>
                 </div>
                 <p className="mt-3 text-gray-600 dark:text-gray-300">{review.comment}</p>
               </div>

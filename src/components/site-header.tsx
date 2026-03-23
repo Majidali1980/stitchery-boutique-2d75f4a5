@@ -5,15 +5,12 @@ import { Button } from "@/components/ui/button";
 import { useTheme } from "@/components/theme-provider";
 import { useCart } from "@/context/CartContext";
 import { useState, useEffect } from "react";
-import { useAuth, UserButton } from "@clerk/clerk-react";
-import { 
+import {
   NavigationMenu,
   NavigationMenuContent,
   NavigationMenuItem,
-  NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 
 export function SiteHeader() {
@@ -21,17 +18,11 @@ export function SiteHeader() {
   const [isScrolled, setIsScrolled] = useState(false);
   const { theme, setTheme } = useTheme();
   const { items: cartItems } = useCart();
-  const { isSignedIn } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 10) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
+      setIsScrolled(window.scrollY > 10);
     };
-
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -111,43 +102,37 @@ export function SiteHeader() {
             )}
           </Link>
 
-          {/* Auth Menu */}
+          {/* Account Menu */}
           <NavigationMenu>
             <NavigationMenuList>
               <NavigationMenuItem>
-                {isSignedIn ? (
-                  <UserButton afterSignOutUrl="/" />
-                ) : (
-                  <>
-                    <NavigationMenuTrigger>
-                      <User className="h-5 w-5 mr-1" />
-                      <span className="hidden sm:inline">Account</span>
-                    </NavigationMenuTrigger>
-                    <NavigationMenuContent>
-                      <div className="w-[220px] p-4 md:w-[240px] lg:w-[280px] space-y-3">
-                        <div className="space-y-1">
-                          <Link to="/sign-in">
-                            <Button variant="outline" className="w-full justify-start">
-                              Sign In
-                            </Button>
-                          </Link>
-                          <Link to="/sign-up">
-                            <Button className="w-full justify-start bg-brand-gold hover:bg-brand-gold/90">
-                              Register
-                            </Button>
-                          </Link>
-                        </div>
-                        <div className="border-t pt-3">
-                          <Link to="/admin-login">
-                            <Button variant="ghost" className="w-full justify-start text-sm">
-                              Admin Login
-                            </Button>
-                          </Link>
-                        </div>
-                      </div>
-                    </NavigationMenuContent>
-                  </>
-                )}
+                <NavigationMenuTrigger>
+                  <User className="h-5 w-5 mr-1" />
+                  <span className="hidden sm:inline">Account</span>
+                </NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <div className="w-[220px] p-4 md:w-[240px] lg:w-[280px] space-y-3">
+                    <div className="space-y-1">
+                      <Link to="/sign-in">
+                        <Button variant="outline" className="w-full justify-start">
+                          Sign In
+                        </Button>
+                      </Link>
+                      <Link to="/sign-up">
+                        <Button className="w-full justify-start bg-brand-gold hover:bg-brand-gold/90">
+                          Register
+                        </Button>
+                      </Link>
+                    </div>
+                    <div className="border-t pt-3">
+                      <Link to="/admin-login">
+                        <Button variant="ghost" className="w-full justify-start text-sm">
+                          Admin Login
+                        </Button>
+                      </Link>
+                    </div>
+                  </div>
+                </NavigationMenuContent>
               </NavigationMenuItem>
             </NavigationMenuList>
           </NavigationMenu>
@@ -181,35 +166,27 @@ export function SiteHeader() {
               </Link>
             ))}
             <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
-              {isSignedIn ? (
-                <Link to="/profile" className="flex items-center space-x-2 py-2">
-                  <span>Your Profile</span>
-                </Link>
-              ) : (
-                <>
-                  <Link 
-                    to="/sign-in"
-                    className="text-gray-700 dark:text-gray-200 hover:text-brand-gold dark:hover:text-brand-gold transition-colors py-2 flex items-center"
-                    onClick={toggleMenu}
-                  >
-                    Sign In
-                  </Link>
-                  <Link 
-                    to="/sign-up"
-                    className="text-gray-700 dark:text-gray-200 hover:text-brand-gold dark:hover:text-brand-gold transition-colors py-2 flex items-center"
-                    onClick={toggleMenu}
-                  >
-                    Register
-                  </Link>
-                  <Link 
-                    to="/admin-login"
-                    className="text-gray-700 dark:text-gray-200 hover:text-brand-gold dark:hover:text-brand-gold transition-colors py-2 flex items-center"
-                    onClick={toggleMenu}
-                  >
-                    Admin Login
-                  </Link>
-                </>
-              )}
+              <Link
+                to="/sign-in"
+                className="text-gray-700 dark:text-gray-200 hover:text-brand-gold dark:hover:text-brand-gold transition-colors py-2 flex items-center"
+                onClick={toggleMenu}
+              >
+                Sign In
+              </Link>
+              <Link
+                to="/sign-up"
+                className="text-gray-700 dark:text-gray-200 hover:text-brand-gold dark:hover:text-brand-gold transition-colors py-2 flex items-center"
+                onClick={toggleMenu}
+              >
+                Register
+              </Link>
+              <Link
+                to="/admin-login"
+                className="text-gray-700 dark:text-gray-200 hover:text-brand-gold dark:hover:text-brand-gold transition-colors py-2 flex items-center"
+                onClick={toggleMenu}
+              >
+                Admin Login
+              </Link>
             </div>
           </nav>
         </div>

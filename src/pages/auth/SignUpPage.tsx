@@ -1,15 +1,15 @@
 
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { SignUp, useAuth } from "@clerk/clerk-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/components/ui/use-toast";
 
 const SignUpPage = () => {
-  const { isSignedIn } = useAuth();
+  const { toast } = useToast();
 
   return (
     <div className="container mx-auto py-16 px-4 relative">
-      {/* Background logo with low opacity */}
       <div className="absolute inset-0 flex items-center justify-center z-0 opacity-5">
         <img 
           src="/lovable-uploads/87751383-1d75-422b-b342-1f320ffb7d64.png" 
@@ -23,22 +23,30 @@ const SignUpPage = () => {
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl">Create an account</CardTitle>
             <CardDescription>
-              Sign up for an account using Clerk authentication
+              Sign up for an MA Tailor account
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {isSignedIn ? (
-              <div className="text-center p-4">
-                <p className="mb-4">You are already signed in!</p>
-                <Link to="/">
-                  <Button>Go to Homepage</Button>
-                </Link>
+            <form className="space-y-4" onSubmit={(e) => {
+              e.preventDefault();
+              toast({ title: "Coming soon", description: "Registration will be available soon." });
+            }}>
+              <div className="space-y-2">
+                <label htmlFor="name" className="text-sm font-medium">Name</label>
+                <Input id="name" type="text" placeholder="Your name" required />
               </div>
-            ) : (
-              <div className="flex justify-center">
-                <SignUp />
+              <div className="space-y-2">
+                <label htmlFor="email" className="text-sm font-medium">Email</label>
+                <Input id="email" type="email" placeholder="your@email.com" required />
               </div>
-            )}
+              <div className="space-y-2">
+                <label htmlFor="password" className="text-sm font-medium">Password</label>
+                <Input id="password" type="password" placeholder="••••••••" required />
+              </div>
+              <Button type="submit" className="w-full bg-brand-gold hover:bg-brand-gold/90">
+                Sign Up
+              </Button>
+            </form>
           </CardContent>
           <CardFooter>
             <div className="text-sm text-center w-full">

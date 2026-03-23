@@ -1,8 +1,17 @@
 
-import { UserButton } from "@clerk/clerk-react";
-import { Bell } from "lucide-react";
+import { Bell, LogOut } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 const AdminHeader = () => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("isAdmin");
+    sessionStorage.removeItem("isAdmin");
+    navigate("/admin-login");
+  };
+
   return (
     <header className="border-b bg-white py-4 px-6">
       <div className="flex items-center justify-between">
@@ -15,7 +24,10 @@ const AdminHeader = () => {
               3
             </span>
           </button>
-          <UserButton afterSignOutUrl="/" />
+          <Button variant="outline" size="sm" onClick={handleLogout}>
+            <LogOut className="h-4 w-4 mr-2" />
+            Logout
+          </Button>
         </div>
       </div>
     </header>
